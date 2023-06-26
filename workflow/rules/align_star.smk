@@ -3,7 +3,7 @@
 
 rule star_align_multi:
     input:
-        ubam = 'results/ubam/{sample_id}.bam',
+        fastq = 'results/original_fastq/{sample_id}.fastq.gz',
         genomeDir = config['star_align_multi']['genomeDir']
     output:
         "results/align_multi/{sample_id}/Aligned.out.bam",
@@ -15,24 +15,17 @@ rule star_align_multi:
     threads: snakemake.utils.available_cpu_count()
     shell:
         '''
-tdir=$(mktemp -d {config[tmpdir]}/{rule}.{wildcards.sample_id}.XXXXXX)
-
-picard SamToFastq\
-  -I {input.ubam}\
-  -F $tdir/R1.fq\
-  -F2 $tdir/R2.fq\
-  --CLIPPING_ATTRIBUTE XT\
-  --CLIPPING_ACTION N\
-  -NON_PF true     
+tdir=$(mktemp -d {config[tmp]}/{rule}.{wildcards.sample_id}.XXXXXX)  
 
 STAR\
   --runThreadN {threads}\
   --genomeDir {input.genomeDir}\
-  --readFilesIn $tdir/R1.fq $tdir/R2.fq\
+  --readFilesIn {input.fastq}\
   --outSAMattributes NH HI NM MD AS XS\
   --outSAMtype BAM Unsorted\
   --outFileNamePrefix $(dirname {output[0]})/\
   --quantMode GeneCounts\
+  --readFilesCommand zcat\
   --outSAMstrandField intronMotif\
   --outFilterMultimapNmax {config[star_align_multi][outFilterMultimapNmax]}\
   --winAnchorMultimapNmax {config[star_align_multi][winAnchorMultimapNmax]}\
