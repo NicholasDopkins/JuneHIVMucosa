@@ -1,0 +1,120 @@
+---
+title: "Metadata Merge Pre Snakemake"
+author: "Phoebe Fei"
+date: "2023-03-31"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+```{css style_settings, echo = FALSE}
+blockquote { 
+    font-size: 14px; 
+    font-style: italic;
+}
+h1{
+    font-size: 22px;
+}
+h2{
+    font-size: 20px;
+}
+h3{
+    font-size: 18px;
+}
+h4{
+    font-size: 16px;
+}
+
+```
+
+
+# Merge Metadata
+The purpose of this script is to merge the clinical and manifest files collected from the original TCGA paper and GDC data portal.
+
+## Input files
+1. From **GDC Portal**, step 1 is to add the correct samples (RNA-seq) to cart.
+>After finding the TCGA-SKCM project, click "Explore project data", then "view files in repository". After filtering for "sequencing reads" in Data Category and "RNA-seq" in Experiemental Strategy, and "STAR 2-Pass Transcriptome" in Workflow type, add all files to cart.
+
+### GDC.manifest.TCGA-SKCM
+>In cart, click "(download) Manifest", converted to tsv.
+
+### GDC.sample.sheet.TCGA-SKCM
+>In cart, click "(download) Sample sheet".
+
+### GDC.Clinical.TCGA-SKCM
+>In cart, click "(download) Clinical", in the extracted folder, select "clinical"
+
+### GDC.biospecimen.TCGA-SKCM
+>In cart, click "(download) Biospecimen", then within the folder there is the sample information 
+
+2. From **Original paper** - [Network CGA. Genomic Classification of Cutaneous Melanoma. Cell. Jun 18 2015;161(7):1681-96.](https://www.sciencedirect.com/science/article/pii/S0092867415006340?via%3Dihub#app2)
+### TCGA-SKCM Paper S1
+>This is the Supplement Table S1 of the paper. 
+
+## Output
+A sample table in the config folder inside workflow containing all metadata we have + the file accession addresses.
+
+## Libraries
+
+```{r, message=FALSE}
+library(stringr)
+library(ggplot2)
+library(dplyr)
+library(magrittr)
+library(tidyverse)
+library(UpSetR)
+library(edgeR)
+library(readxl)
+```
+
+## Reading the data
+
+```{r}
+manifest <- read.delim("/Users/phoebefei/Desktop/WCM/Mets Melanoma/TCGA SKCM/GDC.manifest.TCGA-SKCM.tsv")
+sample_sheet <- read.delim("/Users/phoebefei/Desktop/WCM/Mets Melanoma/TCGA SKCM/GDC.sample.sheet.TCGA-SKCM.tsv")
+#drop columns that are empty
+clinical <- read.delim("/Users/phoebefei/Desktop/WCM/Mets Melanoma/TCGA SKCM/GDC.Clinical.TCGA-SKCM.tsv") %>% mutate_all(funs(str_replace(., "'--", ""))) %>% discard(~all(is.na(.) | . ==""))
+biospec <- read.delim("/Users/phoebefei/Desktop/WCM/Mets Melanoma/TCGA SKCM/GDC.biospecimen.TCGA-SKCM.tsv") %>% mutate_all(funs(str_replace(., "'--", ""))) %>% discard(~all(is.na(.) | . ==""))
+patient <- read_excel("/Users/phoebefei/Desktop/WCM/Mets Melanoma/TCGA SKCM/TCGA-SKCM Paper S1.xlsx",sheet = 4, skip = 1, col_names = TRUE)
+```
+
+## Merging the data
+
+```{r}
+#biospec + sample_sheet
+print(ncol(sample_sheet))
+rownames(biospec) <- biospec$sample_submitter_id
+rownames(sample_sheet) <- sample_sheet$Sample.ID
+sample_sheet <- cbind(sample_sheet,biospec[rownames(sample_sheet),])
+print(ncol(sample_sheet))
+# +patient data
+print(ncol(patient))
+patient$case_submitter <- str_sub(patient$Name,1,-4)
+#had to remove rows that are duplicated
+patient <- patient[which(!duplicated(patient$case_submitter)),]
+rownames(patient) <- patient$case_submitter
+sample_sheet <- sample_sheet[which(!duplicated(sample_sheet$case_submitter_id)),]
+rownames(sample_sheet) <- sample_sheet$case_submitter_id
+#remove if metastatic/primary status unknown
+patient <- cbind(sample_sheet[rownames(patient),], patient) %>% filter(., Sample.Type != "" | !is.na(Sample.Type))
+print(ncol(patient))
+# + clinical
+clinical <- clinical[which(!duplicated(clinical$case_submitter_id)),]
+patient <- merge(x = patient, y = clinical, all = TRUE) %>% filter(., Sample.Type != "" | !is.na(Sample.Type))
+print(ncol(patient))
+# + manifest
+rownames(manifest) <- manifest$id
+rownames(patient) <- patient$File.ID
+tcga_skcm_metadata <- cbind(patient, manifest[rownames(patient),])
+print(ncol(tcga_skcm_metadata))
+#take out duplicated columns and unuseful columns
+drop_cols <- c("project_id","case_id","sample_submitter_id","case_submitter","case_submitter_id","id","File Name","Data.Category","sample_type","ALL_SAMPLES", "ALL_PRIMARY_VS_METASTATIC", "year_of_birth", "year_of_death", "age_at_diagnosis", "days_to_diagnosis", "days_to_last_follow_up", "gender","ethnicity", "state","age_at_index","CURATED_PATHOLOGIC_STAGE_AJCC7_AT_DIAGNOSIS_SIMPLE","CURATED_M_STAGE_AT_DIAGNOSIS_SIMPLE","CURATED_N_STAGE_AT_DIAGNOSIS_SIMPLE","days_to_last_follow_up","days_to_death")
+tcga_skcm_metadata <- tcga_skcm_metadata[,-which(colnames(tcga_skcm_metadata) %in% drop_cols)] %>% filter(., Sample.Type != "" | !is.na(Sample.Type))
+print(ncol(tcga_skcm_metadata))
+```
+
+```{r, eval = FALSE}
+write.csv(tcga_skcm_metadata, "/Users/phoebefei/Desktop/WCM/Mets Melanoma/TCGA SKCM/TCGA_SKCM_mets/resources/METADATA.csv", row.names = FALSE)
+```

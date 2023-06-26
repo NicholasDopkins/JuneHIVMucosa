@@ -1,0 +1,24 @@
+__default__:
+    args: "--parsable "
+    partition: "panda"
+    ntasks: 1
+    cpus-per-task: 2
+    mem: "8G"
+    output: "logs/slurm-%j.{rule}.{wildcards.sample_id}.out"
+    job-name: "sm.{rule}.{wildcards.sample_id}"
+    exclusive: ""    
+star_align_multi:
+    cpus-per-task: 32
+    mem: "120G"
+telescope:
+    cpus-per-task: 4
+    mem: "80G"
+stringtie:
+    cpus-per-task: 2
+    mem: "20G"
+download_bam_tcga:
+    cpus-per-task: 2
+    mem: "80G"
+revert_and_mark_adapters:
+    cpus-per-task: 2
+    mem: "50G"
