@@ -10,7 +10,7 @@ rule download_fastq:
     output:
         "results/original_fastq/{sample_id}.fastq.gz"
     conda:
-        "envs/fastq.yaml"
+        "../envs/fastq.yaml"
     params:
         cmd = pref_command
     wildcard_constraints:
