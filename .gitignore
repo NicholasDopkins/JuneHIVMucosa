@@ -216,8 +216,8 @@ profiles/**
 **runs**
 **samples**
 **fastqc**
+.fastq
+.fastq.gz
 **multiqc**
-
-
 
 .Rproj.user
