@@ -9,4 +9,4 @@ telescope:
     annotation: "resources/retro.hg38.v1.gtf"
 genome_fasta: "resources/GRCh38.d1.vd1.fa"
 annotation_gtf: "resources/gencode.v38.annotation.gtf"
-tmp: "/efs/users/phoebefei/mucosal_tmp"
+tmp: "/athena/nixonlab/scratch/tof4003/mucosal_tmp"
