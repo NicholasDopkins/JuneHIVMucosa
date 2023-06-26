@@ -16,9 +16,6 @@ telescope:
 stringtie:
     cpus-per-task: 2
     mem: "20G"
-download_bam_tcga:
-    cpus-per-task: 2
+download_raw:
+    cpus-per-task: 4
     mem: "80G"
-revert_and_mark_adapters:
-    cpus-per-task: 2
-    mem: "50G"
