@@ -1,4 +1,4 @@
-metadata: "resources/RunTable_HIV_mucosal.csv.csv"
+metadata: "resources/RunTable_HIV_mucosal.csv"
 sample_id: "Run"
 SOURCE: "Run"
 star_align_multi:
