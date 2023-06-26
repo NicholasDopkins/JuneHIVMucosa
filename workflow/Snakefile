@@ -10,7 +10,7 @@ min_version("6.4.1")
 configfile: "config/config.yaml"
 
 include: "rules/common.smk"
-include: "rules/download_and_make_ubam.smk"
+include: "rules/download_raw.smk"
 include: "rules/align_star.smk"
 include: "rules/sort_cram.smk"
 include: "rules/telescope.smk"
@@ -19,7 +19,7 @@ include: "rules/stringtie.smk"
 localrules: sample_download
 rule sample_download:
     input:
-        expand("results/ubam/{sample_id}.bam", sample_id=list(samples.index))
+        expand("results/original_fastq/{sample_id}.fastq.gz", sample_id=list(META.index))
 
 ## when job completed, remove the ubam to save space
 localrules: star_align
@@ -39,7 +39,7 @@ rm {input[3]}
 localrules: star_complete
 rule star_complete:
     input:
-        expand("results/complete/{s}_star_align.txt", s=list(samples.index))
+        expand("results/complete/{s}_star_align.txt", s=list(META.index))
 
 localrules: sample_complete
 rule sample_complete:
@@ -59,4 +59,4 @@ rm {input[1]}
 localrules: all
 rule all:
     input:
-        expand("results/complete/{s}.txt", s=list(samples.index))
+        expand("results/complete/{s}.txt", s=list(META.index))

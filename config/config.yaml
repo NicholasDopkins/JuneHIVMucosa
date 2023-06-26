@@ -1,7 +1,6 @@
-tcga_metadata: "resources/METADATA.csv"
-tcga_file_id: "File.ID"
-tcga_sample_id: "Sample.ID"
-GDC_token: "/home/tof4003/gdc_token_fei.txt"
+metadata: "resources/RunTable_HIV_mucosal.csv.csv"
+sample_id: "Run"
+SOURCE: "Run"
 star_align_multi:
     genomeDir: "resources/STAR_gdc38_gencode38"
     outFilterMultimapNmax: 200
@@ -10,5 +9,4 @@ telescope:
     annotation: "resources/retro.hg38.v1.gtf"
 genome_fasta: "resources/GRCh38.d1.vd1.fa"
 annotation_gtf: "resources/gencode.v38.annotation.gtf"
-ega_credentials: "$HOME/.egaconfig"
-tmp: "/athena/nixonlab/scratch/tof4003/TCGA-SKCM_tmp"
+tmp: "/efs/users/phoebefei/mucosal_tmp"
