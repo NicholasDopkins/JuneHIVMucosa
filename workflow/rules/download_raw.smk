@@ -5,7 +5,7 @@ def pref_command(wc):
     SRR = META.loc[wc.sample_id][config['SOURCE']]
     return SRR
 
-rule download_raw:
+rule download_fastq:
     # download the files from SRA
     output:
         "results/original_fastq/{sample_id}.fastq.gz"
