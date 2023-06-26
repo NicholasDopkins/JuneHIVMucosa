@@ -39,7 +39,7 @@ rule samtools_bam_cram:
         bam = "results/align_multi/{sample_id}/Aligned.out.bam",
         ref = config['genome_fasta']
     output:
-        "results/align_multi/{sample_id}/Aligned.out.cram",
+        "results/align_multi/{sample_id}/Aligned.out.cram"
     conda:
         "../envs/utils.yaml"
     threads: 2
