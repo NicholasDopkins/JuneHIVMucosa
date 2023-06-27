@@ -23,7 +23,7 @@ rule download_fastq:
 mkdir -p results
 mkdir -p results/original_fastq
 prefetch {params.cmd} -O runs/{wildcards.sample_id} -X 9999999999999
-fastq-dump runs/{wildcards.sample_id}/{params.cmd}/{params.cmd}.sra | gzip > {output}
+fastq-dump --gzip -O results/original_fastq runs/{wildcards.sample_id}/{params.cmd}/{params.cmd}.sra
         '''
 
 localrules: download_raw
