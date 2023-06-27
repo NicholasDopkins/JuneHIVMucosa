@@ -19,7 +19,7 @@ stringtie:
 samtools_sort_cram:
     cpus-per-task: 2
     mem: "20G"
- samtools_bam_cram:
+samtools_bam_cram:
     cpus-per-task: 4
     mem: "20G"
 download_raw:
