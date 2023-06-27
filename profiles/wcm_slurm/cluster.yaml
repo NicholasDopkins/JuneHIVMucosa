@@ -9,12 +9,18 @@ __default__:
     exclusive: ""    
 star_align_multi:
     cpus-per-task: 32
-    mem: "120G"
+    mem: "140G"
 telescope:
     cpus-per-task: 4
-    mem: "80G"
+    mem: "100G"
 stringtie:
     cpus-per-task: 2
+    mem: "30G"
+samtools_sort_cram:
+    cpus-per-task: 2
+    mem: "20G"
+ samtools_bam_cram:
+    cpus-per-task: 4
     mem: "20G"
 download_raw:
     cpus-per-task: 4
