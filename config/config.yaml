@@ -2,11 +2,11 @@ metadata: "resources/RunTable_HIV_mucosal.csv"
 sample_id: "Run"
 SOURCE: "Run"
 star_align_multi:
-    genomeDir: "resources/STAR_gdc38_gencode38"
+    genomeDir: "/fsx/databases/snakemake_references.git/databases/indexes/STAR_gdc38_gencode38"
     outFilterMultimapNmax: 200
     winAnchorMultimapNmax: 200
 telescope:
-    annotation: "resources/retro.hg38.v1.gtf"
-genome_fasta: "resources/GRCh38.d1.vd1.fa"
-annotation_gtf: "resources/gencode.v38.annotation.gtf"
-tmp: "/athena/nixonlab/scratch/tof4003/mucosal_tmp"
+    annotation: "/fsx/databases/snakemake_references.git/databases/annotations/retro.hg38.v1.gtf"
+genome_fasta: "/fsx/databases/snakemake_references.git/databases/sequences/gdc38.fna"
+annotation_gtf: "/fsx/databases/snakemake_references.git/databases/annotations/gencode.v38.annotation.gtf"
+tmp: "/efs/users/nliotta/mucosal_tmp"
