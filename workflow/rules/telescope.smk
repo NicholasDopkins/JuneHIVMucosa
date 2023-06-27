@@ -15,7 +15,7 @@ rule telescope:
         "../envs/telescope.v1.yaml"
     shell:
         '''
-tdir=$(mktemp -d {config[tmpdir]}/{rule}.{wildcards.sample_id}.XXXXXX)
+tdir=$(mktemp -d {config[tmp]}/{rule}.{wildcards.sample_id}.XXXXXX)
 
 telescope assign\
  --exp_tag inform\
@@ -51,7 +51,7 @@ rm -rf $tdir
 #     threads: 2
 #     shell:
 #         '''
-# tdir=$(mktemp -d {config[tmpdir]}/{rule}.{wildcards.sample_id}.XXXXXX)
+# tdir=$(mktemp -d {config[tmp]}/{rule}.{wildcards.sample_id}.XXXXXX)
 #         
 # telescope bulk assign\
 #   --exp_tag inform\
