@@ -1,0 +1,115 @@
+---
+title: "HIV_HERV"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##setwd
+```{r}
+setwd(/mnt/d/Nixon Lab/HERV Gut - interferome Mario Paper/RDirectory/HIV_HERV)
+```
+
+
+## load packages
+```{r}
+library(tidyverse)
+library(data.table)
+library(PCAtools)
+library(dplyr)
+library(matrixStats)
+library(edgeR)
+library(DESeq2)
+library(EnhancedVolcano)
+library(ashr)
+library(cowplot)
+library(ggsci)
+library(ggplot2)
+library(ggpubr)
+library(fgsea)
+library(pheatmap)
+library(scales)
+library(scopetools)
+```
+##load data
+```{r}
+metadata.csv <- read.csv("PRJNA558500MetaData.csv")
+
+load_samples <- function(df) {
+  
+  sample_names <- rownames(df)
+  
+  retro_files <- file.path(paste("Raw Data/telescope/", sep = ""))
+  
+retro_counts <- load_telescope_reports("Raw Data/telescope/SRR9898939/SRR9898939.tsv"
+
+load_tele
+}
+
+```
+
+```{r}
+setwd("D:\\Nixon Lab/HERV Gut - interferome Mario Paper/RDirectory/HIV_HERV/")
+###########Scopetools##################################
+####Create a list of sample names
+
+sam_names_dir <- gsub(paste("Raw Data/telescope1/","\\/",sep = ""),"",list.dirs("Raw Data/telescope1/"))[-1]
+
+####load_telescope_reports - files: give a list of paths that contain the telescope reports, colnames: column names 
+raw_herv <- load_telescope_reports(files = paste("Raw Data/telescope1/",sam_names_dir,"/",sam_names_dir,".tsv", sep = ""), colnames = sam_names_dir)
+
+
+##filter lowly abundant retrotransposons
+cutoff.count <- 5
+cutoff.sample <- floor(ncol(raw_herv) * 0.1)
+raw_herv <- raw_herv[rowSums(raw_herv > cutoff.count) > cutoff.sample, ]
+raw_herv <- raw_herv[!(row.names(raw_herv) %in% "__no_feature"),]
+```
+
+##DESEQ2
+```{r}
+
+ddsf <- read.csv(file = "PRJNA558500MetaData.csv")
+dds <- DESeqDataSetFromMatrix(countData = raw_herv, colData = ddsf, design = ~ disease)
+dds$disease <- relevel(dds$disease, ref = "")
+dds <- DESeq(dds)
+resultsNames(dds)
+
+##disease_HIV.1_vs_
+
+resultsdds <- results(dds, name = "disease_HIV.1_vs_")
+```
+
+##Make Volcano Plot
+
+```{r}
+
+pdf("HIV vs Healthy.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds, lab = rownames(resultsdds), x = 'log2FoldChange', y = 'pvalue', title = 'Retrotransposon', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', xlim = c(-5, 5), ylim = c(0, 20))
+
+dev.off()
+
+
+```
+##Export List of Significantly Altered Retrotransposons
+```{r}
+
+ddsSig <- subset(resultsdds, pvalue < 0.05)
+ddsSig <- subset(resultsdds, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSig <- as.data.frame(ddsSig)
+write.csv(ddsSig,"Raw Data/ddsSig", row.names = TRUE)
+
+```
+
+
+
+```{r}
+##Change column names ##Null Unless Wanting Use for downstream analysis
+colnames(raw_herv) <- c('PrEP_1', 'PrEP_2', 'PrEP_3', 'PrEP_4', 'PrEP_5', 'PrEP_6', 'PrEP_7', 'PrEP_8', 'PrEP_9','PrEP_10', 'HIV-1_1', 'PrEP_11', 'HIV-1_2', 'HIV-1_3', 'HIV-1_4', 'HIV-1_5', 'HIV-1_6', 'HIV-1_7', 'HIV-1_8', 'HIV-1_9', 'HIV-1_10', 'HIV-1_11', 'HIV-1_12', 'HIV-1_13', 'HIV-1_14', 'HIV-1_15', 'HIV-1_16', 'HIV-1_17', 'HIV-1_18', 'HIV-1_19', 'PrEP_12', 'PrEP_13')
+
+```
+
+
+
