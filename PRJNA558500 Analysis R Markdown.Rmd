@@ -7,10 +7,6 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-##setwd
-```{r}
-setwd(/mnt/d/Nixon Lab/HERV Gut - interferome Mario Paper/RDirectory/HIV_HERV)
-```
 
 
 ## load packages
@@ -34,6 +30,7 @@ library(scales)
 library(scopetools)
 ```
 
+
 ```{r}
 setwd("D:\\Nixon Lab/HERV Gut - interferome Mario Paper/RDirectory/HIV_HERV/")
 ###########Scopetools##################################
@@ -56,27 +53,51 @@ raw_herv <- raw_herv[!(row.names(raw_herv) %in% "__no_feature"),]
 ```{r}
 
 ddsf <- read.csv(file = "PRJNA558500MetaData.csv")
+ddsf[which(ddsf$disease == ""),"disease"] <- "HIVneg"
+ddsf[which(ddsf$disease == "HIV-1"),"disease"] <- "HIVpos"
 dds <- DESeqDataSetFromMatrix(countData = raw_herv, colData = ddsf, design = ~ disease)
-dds$disease <- relevel(dds$disease, ref = "")
+dds$disease <- relevel(dds$disease, ref = "HIVneg")
 dds <- DESeq(dds)
 resultsNames(dds)
 
-##disease_HIV.1_vs_
+##disease_HIVpos_vs_HIVneg.
 
-resultsdds <- results(dds, name = "disease_HIV.1_vs_")
+resultsdds <- results(dds, name = "disease_HIVpos_vs_HIVneg")
 ```
 
 ##Make Volcano Plot
 
 ```{r}
 
-pdf("HIV vs Healthy.pdf")
-EnhancedVolcano::EnhancedVolcano(resultsdds, lab = rownames(resultsdds), x = 'log2FoldChange', y = 'pvalue', title = 'Retrotransposon', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', xlim = c(-5, 5), ylim = c(0, 20))
+pdf("HIV+ vs HIV-.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds, lab = rownames(resultsdds), x = 'log2FoldChange', y = 'pvalue', title = 'Gut Biopsy Retrotranscriptome', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', xlim = c(-5, 5), ylim = c(0, 20))
 
 dev.off()
 
 
 ```
+
+##Make PCA
+
+```{r}
+vst <- assay(vst(dds))
+p <- pca(vst, metadata = colData(dds), removeVar = 0.1)
+
+pdf("SCREE plot.pdf")
+screeplot(p, axisLabSize = 10, titleLabSize = 22)
+
+dev.off()
+
+pdf("biplot.pdf")
+biplot(p, lab = p$disease, labSize = 2, pointSize = 2, colby = 'disease', showLoadingsNames = TRUE, legendPosition = 'right', encircle = TRUE, xlim = c(-50,50), ylim = c(-50,50), title = 'Gut Biopsy Retrotranscriptome')
+
+dev.off()
+
+```
+
+
+
+
 ##Export List of Significantly Altered Retrotransposons
 ```{r}
 
