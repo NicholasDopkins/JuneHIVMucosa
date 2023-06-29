@@ -33,22 +33,6 @@ library(pheatmap)
 library(scales)
 library(scopetools)
 ```
-##load data
-```{r}
-metadata.csv <- read.csv("PRJNA558500MetaData.csv")
-
-load_samples <- function(df) {
-  
-  sample_names <- rownames(df)
-  
-  retro_files <- file.path(paste("Raw Data/telescope/", sep = ""))
-  
-retro_counts <- load_telescope_reports("Raw Data/telescope/SRR9898939/SRR9898939.tsv"
-
-load_tele
-}
-
-```
 
 ```{r}
 setwd("D:\\Nixon Lab/HERV Gut - interferome Mario Paper/RDirectory/HIV_HERV/")
