@@ -28,9 +28,10 @@ library(fgsea)
 library(pheatmap)
 library(scales)
 library(scopetools)
+library(pheatmap)
 ```
 
-
+##Gut Biopses
 ```{r}
 setwd("D:\\Nixon Lab/HERV Gut - interferome Mario Paper/RDirectory/HIV_HERV/")
 ###########Scopetools##################################
@@ -49,7 +50,7 @@ raw_herv <- raw_herv[rowSums(raw_herv > cutoff.count) > cutoff.sample, ]
 raw_herv <- raw_herv[!(row.names(raw_herv) %in% "__no_feature"),]
 ```
 
-##DESEQ2
+##DESEQ2 Gut Biopses
 ```{r}
 
 ddsf <- read.csv(file = "PRJNA558500MetaData.csv")
@@ -65,7 +66,7 @@ resultsNames(dds)
 resultsdds <- results(dds, name = "disease_HIVpos_vs_HIVneg")
 ```
 
-##Make Volcano Plot
+##Make Volcano Plot Gut Biopses
 
 ```{r}
 
@@ -77,7 +78,7 @@ dev.off()
 
 ```
 
-##Make PCA
+##Make PCA Gut Biopses
 
 ```{r}
 vst <- assay(vst(dds))
@@ -95,7 +96,183 @@ dev.off()
 
 ```
 
+##Interferome
+```{r}
 
+####Create a list of sample names
+
+sam_names_dir_interferome <- gsub(paste("Raw Data Interferome/telescope1/","\\/",sep = ""),"",list.dirs("Raw Data Interferome/telescope1/"))[-1]
+
+####load_telescope_reports - files: give a list of paths that contain the telescope reports, colnames: column names 
+raw_herv_interferome <- load_telescope_reports(files = paste("Raw Data Interferome/telescope1/", sam_names_dir_interferome,"/",sam_names_dir_interferome,".tsv", sep = ""), colnames = sam_names_dir_interferome)
+
+
+##filter lowly abundant retrotransposons
+cutoff.count <- 5
+cutoff.sample <- floor(ncol(raw_herv_interferome) * 0.1)
+raw_herv_interferome <- raw_herv_interferome[rowSums(raw_herv_interferome > cutoff.count) > cutoff.sample, ]
+raw_herv_interferome <- raw_herv_interferome[!(row.names(raw_herv_interferome) %in% "__no_feature"),]
+```
+
+
+##DESEQ2 Interferome
+```{r}
+
+ddsf_Interferome <- read.csv(file = "PRJNA558974MetaData.csv")
+dds_Interferome <- DESeqDataSetFromMatrix(countData = raw_herv_interferome, colData = ddsf_Interferome, design = ~ Library.Name )
+dds_Interferome$Library.Name <- relevel(dds_Interferome$Library.Name, ref = "m")
+dds_Interferome <- DESeq(dds_Interferome)
+resultsNames(dds_Interferome)
+
+##disease_"Library.Name_a1_vs_m"  "Library.Name_a14_vs_m" "Library.Name_a2_vs_m"  "Library.Name_a5_vs_m" "Library.Name_a8_vs_m"  "Library.Name_b_vs_m" 
+
+
+
+```
+
+
+##Make Volcano Plot Library.Name_a1_vs_m
+
+```{r}
+
+resultsdds_Interferome_Library.Name_a1_vs_m <- results(dds_Interferome, name = "Library.Name_a1_vs_m")
+
+pdf("Library.Name_a1_vs_m.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a1_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a1_vs_m), x = 'log2FoldChange', y = 'pvalue', title = 'IFNa1_vs_m', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', xlim = c(-10, 10), ylim = c(0, 6.5))
+
+dev.off()
+
+
+```
+
+
+##Make Volcano Plot Library.Name_a14_vs_m
+
+```{r}
+
+resultsdds_Interferome_Library.Name_a14_vs_m <- results(dds_Interferome, name = "Library.Name_a14_vs_m")
+
+pdf("Library.Name_a14_vs_m.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a14_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a14_vs_m), x = 'log2FoldChange', y = 'pvalue', title = 'IFNa14_vs_m', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', xlim = c(-10, 10), ylim = c(0, 6.5))
+
+dev.off()
+
+
+```
+
+##Make Volcano Plot Library.Name_a2_vs_m
+
+```{r}
+
+resultsdds_Interferome_Library.Name_a2_vs_m <- results(dds_Interferome, name = "Library.Name_a2_vs_m")
+
+pdf("Library.Name_a2_vs_m.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a2_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a2_vs_m), x = 'log2FoldChange', y = 'pvalue', title = 'IFNa2_vs_m', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', xlim = c(-10, 10), ylim = c(0, 6.5))
+
+dev.off()
+
+
+```
+
+
+##Make Volcano Plot Library.Name_a5_vs_m
+
+```{r}
+
+resultsdds_Interferome_Library.Name_a5_vs_m <- results(dds_Interferome, name = "Library.Name_a5_vs_m")
+
+pdf("Library.Name_a5_vs_m.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a5_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a5_vs_m), x = 'log2FoldChange', y = 'pvalue', title = 'IFNa5_vs_m', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', xlim = c(-10, 10), ylim = c(0, 6.5))
+
+dev.off()
+
+
+```
+
+
+##Make Volcano Plot Library.Name_a8_vs_m
+
+```{r}
+
+resultsdds_Interferome_Library.Name_a8_vs_m <- results(dds_Interferome, name = "Library.Name_a8_vs_m")
+
+pdf("Library.Name_a8_vs_m.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a8_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a8_vs_m), x = 'log2FoldChange', y = 'pvalue', title = 'IFNa8_vs_m', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', xlim = c(-10, 10), ylim = c(0, 6.5))
+
+dev.off()
+
+
+```
+
+##Make Volcano Plot Library.Name_b_vs_m
+
+```{r}
+
+resultsdds_Interferome_Library.Name_b_vs_m <- results(dds_Interferome, name = "Library.Name_b_vs_m")
+
+pdf("Library.Name_b_vs_m.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_b_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_b_vs_m), x = 'log2FoldChange', y = 'pvalue', title = 'IFNb_vs_m', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', xlim = c(-10, 10), ylim = c(0, 6.5))
+
+dev.off()
+
+
+```
+
+
+
+
+##Make PCA Interferome
+
+```{r}
+vst_Interferome <- assay(vst(dds_Interferome))
+p_Interferome <- pca(vst_Interferome, metadata = colData(dds_Interferome), removeVar = 0.1)
+
+pdf("SCREE plot_Interferome.pdf")
+screeplot(p_Interferome, axisLabSize = 10, titleLabSize = 22)
+
+dev.off()
+
+pdf("biplot_Interferome.pdf")
+biplot(p_Interferome, lab = p_Interferome$Library.Name, labSize = 2, pointSize = 2, colby = 'Library.Name', showLoadingsNames = TRUE, legendPosition = 'right', encircle = TRUE, xlim = c(-50,50), ylim = c(-50,50), title = 'IFN Stimulation')
+
+dev.off()
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##Make Heatmap
+```{r}
+select <- order(rowMeans(counts(dds,normalized=TRUE)),
+                decreasing=TRUE)[1:20]
+df <- as.data.frame(colData(resultsdds)[,c("disease")])
+pheatmap(assay(dds)[select,], cluster_rows=FALSE, show_rownames=FALSE,
+         cluster_cols=FALSE, annotation_col=df)
+
+pheat
+```
 
 
 ##Export List of Significantly Altered Retrotransposons
