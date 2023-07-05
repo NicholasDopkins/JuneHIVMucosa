@@ -96,6 +96,127 @@ dev.off()
 
 ```
 
+##Summary Data Bar Charts
+```{r}
+#count_mat: the count matrix; meta = metadata; annotation = TE or gene annotation, the summary category table to build stack plot from; category = the category from annotation table to summarize from; cont = the contrast group from matadata
+annotation <- read.delim("TE_annotation.v2.0.tsv", row.names = 1)
+meta <- metadata.csv
+rownames(meta) <- meta$`ï..Run`
+meta[which(meta$disease == ""),"disease"] <- "HIVneg"
+meta[which(meta$disease == "HIV-1"),"disease"] <- "HIVpos"
+  
+abundance_sum <- function(count_mat,meta, annotation, category, cont = "disease"){
+  sum_table <- data.frame(matrix(ncol = 5))
+  colnames(sum_table) <- c(cont, category, "Count","PCT","AvgCount")
+  e.te.annot <- annotation[rownames(count_mat),,drop = FALSE]
+  e.te.annot$ids <- rownames(e.te.annot)
+  meta$ids <- rownames(meta)
+  for(trait in unique(meta[,cont])){
+    sample_sub <- meta[which(meta[,cont] == trait),"ids"]
+    #print(sample_sub)
+    for(sub_cat in unique(e.te.annot[,category])){
+      #print(which(e.te.annot[,category] == sub_cat))
+      sub_cat_rows <- e.te.annot[which(e.te.annot[,category] == sub_cat),"ids"]
+      #print(sub_cat_rows[1])
+      count_mat_sub_rows <- count_mat[sub_cat_rows,sample_sub]
+      #print(count_mat_sub_rows)
+      sum_table[nrow(sum_table) + 1,c(1:3,5)] <- c(trait, sub_cat, sum(count_mat_sub_rows), round(sum(count_mat_sub_rows)/ncol(count_mat_sub_rows),2))
+    }
+    sum_table$Count <- as.numeric(sum_table$Count)
+    sum_table$AvgCount <- as.numeric(sum_table$AvgCount)
+    stat_row_sum <- sum(sum_table[which(sum_table[,cont] == trait),"Count"])
+    sum_table[which(sum_table[,cont] == trait),4] <- round(((sum_table[which(sum_table[,cont] == trait), "Count"])/stat_row_sum)*100,2)
+  }
+  sum_table <- sum_table[-1,]
+  return(sum_table)
+}
+```
+
+##Run Function
+```{r}
+
+herv_Category <- abundance_sum(count_mat = raw_herv,meta = meta, annotation = annotation, category = "Category", cont = "disease")
+
+herv_Class <- abundance_sum(count_mat = raw_herv,meta = meta, annotation = annotation, category = "Class", cont = "disease")
+
+herv_Chrom<- abundance_sum(count_mat = raw_herv,meta = meta, annotation = annotation, category = "Chrom", cont = "disease")
+
+TE_type <- abundance_sum(count_mat = raw_herv,meta = meta, annotation = annotation, category = "TE_type", cont = "disease")
+
+```
+
+##Plot Summary
+```{r}
+#group
+pdf("group_count.pdf")
+
+ggplot(herv_Category, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Category, -AvgCount))) + geom_bar(stat = "identity", color = "black") + xlab("disease")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "HERV Category")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+
+
+dev.off()
+
+#class
+pdf("group_class.pdf")
+ggplot(herv_Class, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Class, -AvgCount))) + geom_bar(stat = "identity", color = "black") + xlab("disease")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Class")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+
+dev.off()
+
+#chrom
+pdf("group_chrom.pdf")
+ggplot(herv_Chrom, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Chrom, -AvgCount))) + geom_bar(stat = "identity", color = "black") + xlab("disease")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Chrom")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+
+dev.off()
+
+#TE_type
+pdf("TE_type.pdf")
+ggplot(TE_type, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(TE_type, -AvgCount))) + geom_bar(stat = "identity", color = "black") + xlab("disease")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE type")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+
+dev.off()
+
+
+#groupPCT
+pdf("group_count_pct.pdf")
+
+ggplot(herv_Category, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Category, -PCT))) + geom_bar(stat = "identity", color = "black") + xlab("disease")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "HERV Category")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+dev.off()
+
+#classPCT
+pdf("group_class_pct.pdf")
+ggplot(herv_Class, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Class, -PCT))) + geom_bar(stat = "identity", color = "black") + xlab("disease")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Class")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+
+dev.off()
+
+#chromPCT
+pdf("group_chrom_pct.pdf")
+ggplot(herv_Chrom, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Chrom, -PCT))) + geom_bar(stat = "identity", color = "black") + xlab("disease")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Chrom")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+
+dev.off()
+
+#TE_typePCT
+pdf("TE_type_pct.pdf")
+ggplot(TE_type, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(TE_type, -PCT))) + geom_bar(stat = "identity", color = "black") + xlab("disease")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE type")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+
+dev.off()
+
+```
+
+
 ##Interferome
 ```{r}
 
@@ -113,6 +234,132 @@ cutoff.sample <- floor(ncol(raw_herv_interferome) * 0.1)
 raw_herv_interferome <- raw_herv_interferome[rowSums(raw_herv_interferome > cutoff.count) > cutoff.sample, ]
 raw_herv_interferome <- raw_herv_interferome[!(row.names(raw_herv_interferome) %in% "__no_feature"),]
 ```
+
+
+##Summary Data Bar Charts Interferome
+```{r}
+#count_mat: the count matrix; meta = metadata; annotation = TE or gene annotation, the summary category table to build stack plot from; category = the category from annotation table to summarize from; cont = the contrast group from matadata
+meta_int <- ddsf_Interferome
+rownames(meta_int) <- meta_int$`ï..Run`
+
+  
+abundance_sum_int <- function(count_mat,meta, annotation, category, cont = "Library.Name"){
+  sum_table <- data.frame(matrix(ncol = 5))
+  colnames(sum_table) <- c(cont, category, "Count","PCT","AvgCount")
+  e.te.annot <- annotation[rownames(count_mat),,drop = FALSE]
+  e.te.annot$ids <- rownames(e.te.annot)
+  meta$ids <- rownames(meta)
+  for(trait in unique(meta[,cont])){
+    sample_sub <- meta[which(meta[,cont] == trait),"ids"]
+    #print(sample_sub)
+    for(sub_cat in unique(e.te.annot[,category])){
+      #print(which(e.te.annot[,category] == sub_cat))
+      sub_cat_rows <- e.te.annot[which(e.te.annot[,category] == sub_cat),"ids"]
+      #print(sub_cat_rows[1])
+      count_mat_sub_rows <- count_mat[sub_cat_rows,sample_sub]
+      #print(count_mat_sub_rows)
+      sum_table[nrow(sum_table) + 1,c(1:3,5)] <- c(trait, sub_cat, sum(count_mat_sub_rows), round(sum(count_mat_sub_rows)/ncol(count_mat_sub_rows),2))
+    }
+    sum_table$Count <- as.numeric(sum_table$Count)
+    sum_table$AvgCount <- as.numeric(sum_table$AvgCount)
+    stat_row_sum <- sum(sum_table[which(sum_table[,cont] == trait),"Count"])
+    sum_table[which(sum_table[,cont] == trait),4] <- round(((sum_table[which(sum_table[,cont] == trait), "Count"])/stat_row_sum)*100,2)
+  }
+  sum_table <- sum_table[-1,]
+  return(sum_table)
+}
+```
+
+##Run Function Interferome
+```{r}
+
+herv_Category_int <- abundance_sum_int(count_mat = raw_herv_interferome,meta = meta_int, annotation = annotation, category = "Category", cont = "Library.Name")
+
+herv_Class_int <- abundance_sum_int(count_mat = raw_herv_interferome,meta = meta_int, annotation = annotation, category = "Class", cont = "Library.Name")
+
+herv_Chrom_int <- abundance_sum_int(count_mat = raw_herv_interferome,meta = meta_int, annotation = annotation, category = "Chrom", cont = "Library.Name")
+
+TE_type_int <- abundance_sum_int(count_mat = raw_herv_interferome,meta = meta_int, annotation = annotation, category = "TE_type", cont = "Library.Name")
+
+```
+
+##Plot Summary Interferome
+```{r}
+#group
+pdf("group_count_int.pdf")
+
+ggplot(herv_Category_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a14", "b")), y = AvgCount, fill = reorder(Category, -AvgCount))) + geom_bar(stat = "identity", color = "black") + xlab("Library.Name")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "HERV Category")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+
+
+dev.off()
+
+#class
+pdf("group_class_int.pdf")
+ggplot(herv_Class_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a14", "b")), y = AvgCount, fill = reorder(Class, -AvgCount))) + geom_bar(stat = "identity", color = "black") + xlab("Library.Name")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "HERV Class")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+dev.off()
+
+#chrom
+pdf("group_chrom_int.pdf")
+
+ggplot(herv_Chrom_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a14", "b")), y = AvgCount, fill = reorder(Chrom, -AvgCount))) + geom_bar(stat = "identity", color = "black") + xlab("Library.Name")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "Chrom")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+
+dev.off()
+
+#TE_type
+pdf("TE_type_int.pdf")
+ggplot(TE_type_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a14", "b")), y = AvgCount, fill = reorder(TE_type, -AvgCount))) + geom_bar(stat = "identity", color = "black") + xlab("Library.Name")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE_type")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+
+dev.off()
+
+
+#groupPCT
+pdf("group_count_int_pct.pdf")
+
+ggplot(herv_Category_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a14", "b")), y = PCT, fill = reorder(Category, -PCT))) + geom_bar(stat = "identity", color = "black") + xlab("Library.Name")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "HERV Category")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+
+
+dev.off()
+
+#classPCT
+pdf("group_class_int_pct.pdf")
+ggplot(herv_Class_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a14", "b")), y = PCT, fill = reorder(Class, -PCT))) + geom_bar(stat = "identity", color = "black") + xlab("Library.Name")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "HERV Class")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+
+
+dev.off()
+
+#chromPCT
+pdf("group_chrom_int_pct.pdf")
+ggplot(herv_Chrom_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a14", "b")), y = PCT, fill = reorder(Chrom, -PCT))) + geom_bar(stat = "identity", color = "black") + xlab("Library.Name")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "Chrom")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+
+
+dev.off()
+
+#TE_typePCT
+pdf("TE_type_int_pct.pdf")
+ggplot(TE_type_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a14", "b")), y = PCT, fill = reorder(TE_type, -PCT))) + geom_bar(stat = "identity", color = "black") + xlab("Library.Name")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE_type")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+
+
+dev.off()
+
+```
+
+
 
 
 ##DESEQ2 Interferome
@@ -237,6 +484,41 @@ biplot(p_Interferome, lab = p_Interferome$Library.Name, labSize = 2, pointSize =
 
 dev.off()
 
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##Make Heatmap
+```{r}
+select <- order(rowMeans(counts(dds,normalized=TRUE)),
+                decreasing=TRUE)[1:20]
+df <- as.data.frame(colData(resultsdds)[,c("disease")])
+pheatmap(assay(dds)[select,], cluster_rows=FALSE, show_rownames=FALSE,
+         cluster_cols=FALSE, annotation_col=df)
+
+pheat
 ```
 
 
