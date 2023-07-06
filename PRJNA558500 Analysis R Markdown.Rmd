@@ -29,6 +29,9 @@ library(pheatmap)
 library(scales)
 library(scopetools)
 library(pheatmap)
+library(ggVennDiagram)
+library(dplyr)
+library(magrittr)
 ```
 
 ##Gut Biopses
@@ -527,21 +530,92 @@ dev.off()
 
 
 
+##ggVennDiagram Interferome
+
+```{r}
+#"Library.Name_a1_vs_m"  "Library.Name_a14_vs_m" "Library.Name_a2_vs_m"  "Library.Name_a5_vs_m" "Library.Name_a8_vs_m"  "Library.Name_b_vs_m" 
+
+#upregulated
+res_herv_pm_a1_vs_m_up <- results(dds_Interferome, independentFiltering = TRUE, name = "Library.Name_a1_vs_m") %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= 1) %>%
+    filter(pvalue <= 0.05) %>%
+    arrange(pvalue) %>% rownames()
+
+res_herv_pm_a2_vs_m_up <- results(dds_Interferome, independentFiltering = TRUE, name = "Library.Name_a2_vs_m") %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= 1) %>%
+    filter(pvalue <= 0.05) %>%
+    arrange(pvalue) %>% rownames()
+
+res_herv_pm_a5_vs_m_up <- results(dds_Interferome, independentFiltering = TRUE, name = "Library.Name_a5_vs_m") %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= 1) %>%
+    filter(pvalue <= 0.05) %>%
+    arrange(pvalue) %>% rownames()
+
+res_herv_pm_a8_vs_m_up <- results(dds_Interferome, independentFiltering = TRUE, name = "Library.Name_a8_vs_m") %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= 1) %>%
+    filter(pvalue <= 0.05) %>%
+    arrange(pvalue) %>% rownames()
+
+res_herv_pm_a14_vs_m_up <- results(dds_Interferome, independentFiltering = TRUE, name = "Library.Name_a14_vs_m") %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= 1) %>%
+    filter(pvalue <= 0.05) %>%
+    arrange(pvalue) %>% rownames()
+
+res_herv_pm_b_vs_m_up <- results(dds_Interferome, independentFiltering = TRUE, name = "Library.Name_b_vs_m") %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= 1) %>%
+    filter(pvalue <= 0.05) %>%
+    arrange(pvalue) %>% rownames()
+
+#downregulated
+res_herv_pm_a1_vs_m_down <- results(dds_Interferome, independentFiltering = TRUE, name = "Library.Name_a1_vs_m") %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= -1) %>%
+    filter(pvalue <= 0.05) %>%
+    arrange(pvalue) %>% rownames()
+
+res_herv_pm_a2_vs_m_down <- results(dds_Interferome, independentFiltering = TRUE, name = "Library.Name_a2_vs_m") %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= -1) %>%
+    filter(pvalue <= 0.05) %>%
+    arrange(pvalue) %>% rownames()
+
+res_herv_pm_a5_vs_m_down <- results(dds_Interferome, independentFiltering = TRUE, name = "Library.Name_a5_vs_m") %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= -1) %>%
+    filter(pvalue <= 0.05) %>%
+    arrange(pvalue) %>% rownames()
+
+res_herv_pm_a8_vs_m_down <- results(dds_Interferome, independentFiltering = TRUE, name = "Library.Name_a8_vs_m") %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= -1) %>%
+    filter(pvalue <= 0.05) %>%
+    arrange(pvalue) %>% rownames()
+
+res_herv_pm_a14_vs_m_down <- results(dds_Interferome, independentFiltering = TRUE, name = "Library.Name_a14_vs_m") %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= -1) %>%
+    filter(pvalue <= 0.05) %>%
+    arrange(pvalue) %>% rownames()
+
+res_herv_pm_b_vs_m_down <- results(dds_Interferome, independentFiltering = TRUE, name = "Library.Name_b_vs_m") %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= -1) %>%
+    filter(pvalue <= 0.05) %>%
+    arrange(pvalue) %>% rownames()
+
+#upregulated vs m
+ggVennUp <- list(res_herv_pm_a1_vs_m_up, res_herv_pm_a2_vs_m_up, res_herv_pm_a5_vs_m_up, res_herv_pm_a14_vs_m_up, res_herv_pm_b_vs_m_up)
 
 
+pdf("Upregulated TEs Interferome.pdf")
 
+ggVennDiagram(ggVennUp, label = "count", category.names = c("IFNa1","IFNa2","IFNa5", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#56fb0e")
 
+dev.off()
 
+#downregulated vs m
+ggVennDown <- list(res_herv_pm_a1_vs_m_down, res_herv_pm_a2_vs_m_down, res_herv_pm_a5_vs_m_down, res_herv_pm_a14_vs_m_down, res_herv_pm_b_vs_m_down)
 
+pdf("Downregulated TEs Interferome.pdf")
 
+ggVennDiagram(ggVennDown, label = "count", category.names = c("IFNa1","IFNa2","IFNa5", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#ff2f2f")
 
-
-
-
-
-
-
-
+dev.off()
+```
 
 
 
