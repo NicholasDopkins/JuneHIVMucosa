@@ -645,21 +645,97 @@ dev.off()
 ##Heatmap Interferome all
 
 ```{r}
+#Subset genes from DESEQ data for individual heatmaps
 ddsSiga1 <- subset(resultsdds_Interferome_Library.Name_a1_vs_m, pvalue < 0.05)
 ddsSiga1 <- subset(ddsSiga1, log2FoldChange >= 1 | log2FoldChange <= -1)
 ddsSiga1 <- as.data.frame(ddsSiga1)
 
-dfSiga1 <- vst(dds_Interferome, blind = TRUE)
-dfSiga1 <- dfSiga1 %>% assay(.)
-dfSiga1 <- dfSiga1[rownames(ddsSiga1),] %>% assay(.)
+ddsSiga2<- subset(resultsdds_Interferome_Library.Name_a2_vs_m, pvalue < 0.05)
+ddsSiga2 <- subset(ddsSiga2, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSiga2 <- as.data.frame(ddsSiga2)
 
+ddsSiga5<- subset(resultsdds_Interferome_Library.Name_a5_vs_m, pvalue < 0.05)
+ddsSiga5 <- subset(ddsSiga5, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSiga5 <- as.data.frame(ddsSiga5)
 
+ddsSiga8<- subset(resultsdds_Interferome_Library.Name_a8_vs_m, pvalue < 0.05)
+ddsSiga8 <- subset(ddsSiga8, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSiga8 <- as.data.frame(ddsSiga8)
+
+ddsSiga14<- subset(resultsdds_Interferome_Library.Name_a14_vs_m, pvalue < 0.05)
+ddsSiga14 <- subset(ddsSiga14, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSiga14 <- as.data.frame(ddsSiga14)
+
+ddsSigb<- subset(resultsdds_Interferome_Library.Name_b_vs_m, pvalue < 0.05)
+ddsSigb <- subset(ddsSigb, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSigb <- as.data.frame(ddsSigb)
+
+#VSTransform data
+dfSigInt <- vst(dds_Interferome, blind = TRUE)
+dfSigAll <- dfSigInt %>% assay(.)
+
+#Subset data to plot
+dfSiga1 <- dfSigInt[rownames(ddsSiga1),] %>% assay(.)
+
+dfSiga2 <- dfSigInt[rownames(ddsSiga2),] %>% assay(.)
+
+dfSiga5 <- dfSigInt[rownames(ddsSiga5),] %>% assay(.)
+
+dfSiga8 <- dfSigInt[rownames(ddsSiga8),] %>% assay(.)
+
+dfSiga14 <- dfSigInt[rownames(ddsSiga14),] %>% assay(.)
+
+dfSigb <- dfSigInt[rownames(ddsSigb),] %>% assay(.)
 
 pdf("Heatmap Interferome all.pdf")
+dfSigAll_clust <- dfSigAll[, rownames(meta_int)[order(meta_int$Library.Name)]]
+pheatmap(dfSigAll_clust, scale="row",main = "Title",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+
+dev.off()
+
+pdf("Heatmap Interferome a1.pdf")
 dfSiga1_clust <- dfSiga1[, rownames(meta_int)[order(meta_int$Library.Name)]]
+dfSiga1_clust <- data.frame(dfSiga1_clust[, c("SRR9904874", "SRR9904876", "SRR9904885", "SRR9904875", "SRR9904882", "SRR9904877")])
 pheatmap(dfSiga1_clust, scale="row",main = "Title",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
 
 dev.off()
+
+pdf("Heatmap Interferome a2.pdf")
+dfSiga2_clust <- dfSiga2[, rownames(meta_int)[order(meta_int$Library.Name)]]
+dfSiga2_clust <- data.frame(dfSiga2_clust[, c("SRR9904873", "SRR9904879", "SRR9904884", "SRR9904875", "SRR9904882", "SRR9904877")])
+pheatmap(dfSiga2_clust, scale="row",main = "Title",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+
+dev.off()
+
+pdf("Heatmap Interferome a5.pdf")
+dfSiga5_clust <- dfSiga5[, rownames(meta_int)[order(meta_int$Library.Name)]]
+dfSiga5_clust <- data.frame(dfSiga5_clust[, c("SRR9904871", "SRR9904872", "SRR9904878", "SRR9904875", "SRR9904882", "SRR9904877")])
+pheatmap(dfSiga5_clust, scale="row",main = "Title",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+
+dev.off()
+
+pdf("Heatmap Interferome a8.pdf")
+dfSiga8_clust <- dfSiga8[, rownames(meta_int)[order(meta_int$Library.Name)]]
+dfSiga8_clust <- data.frame(dfSiga8_clust[, c("SRR9904867", "SRR9904881", "SRR9904870", "SRR9904875", "SRR9904882", "SRR9904877")])
+pheatmap(dfSiga8_clust, scale="row",main = "Title",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+
+dev.off()
+
+pdf("Heatmap Interferome a14.pdf")
+dfSiga14_clust <- dfSiga14[, rownames(meta_int)[order(meta_int$Library.Name)]]
+dfSiga14_clust <- data.frame(dfSiga14_clust[, c("SRR9904866", "SRR9904869", "SRR9904880", "SRR9904875", "SRR9904882", "SRR9904877")])
+pheatmap(dfSiga14_clust, scale="row",main = "Title",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+
+dev.off()
+
+pdf("Heatmap Interferome b.pdf")
+dfSigb_clust <- dfSigb[, rownames(meta_int)[order(meta_int$Library.Name)]]
+dfSigb_clust <- data.frame(dfSigb_clust[, c("SRR9904886", "SRR9904883", "SRR9904868", "SRR9904875", "SRR9904882", "SRR9904877")])
+pheatmap(dfSigb_clust, scale="row",main = "Title",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+
+dev.off()
+
+
 ```
 
 
