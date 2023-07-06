@@ -32,6 +32,7 @@ library(pheatmap)
 library(ggVennDiagram)
 library(dplyr)
 library(magrittr)
+library(reshape)
 ```
 
 ##Gut Biopses
@@ -617,39 +618,55 @@ ggVennDiagram(ggVennDown, label = "count", category.names = c("IFNa1","IFNa2","I
 dev.off()
 ```
 
+##Heatmaps Gut
 
-
-
-
-
-
-##Make Heatmap
-```{r}
-select <- order(rowMeans(counts(dds,normalized=TRUE)),
-                decreasing=TRUE)[1:20]
-df <- as.data.frame(colData(resultsdds)[,c("disease")])
-pheatmap(assay(dds)[select,], cluster_rows=FALSE, show_rownames=FALSE,
-         cluster_cols=FALSE, annotation_col=df)
-
-pheat
-```
-
-
-##Export List of Significantly Altered Retrotransposons
 ```{r}
 
 ddsSig <- subset(resultsdds, pvalue < 0.05)
-ddsSig <- subset(resultsdds, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSig <- subset(ddsSig, log2FoldChange >= 1 | log2FoldChange <= -1)
 ddsSig <- as.data.frame(ddsSig)
-write.csv(ddsSig,"Raw Data/ddsSig", row.names = TRUE)
 
+dfGut <- vst(dds, blind = TRUE)
+dfGutAll <- dfGut %>% assay(.)
+dfGut <- dfGut[rownames(ddsSig),] %>% assay(.)
+
+pdf("Heatmap gut sig.pdf")
+pheatmap(dfGut, scale="row",main = "Title",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = TRUE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE])
+
+dev.off()
+
+pdf("Heatmap gut all.pdf")
+pheatmap(dfGutAll, scale="row",main = "Title",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE])
+
+dev.off()
+
+
+```
+##Heatmap Interferome all
+
+```{r}
+ddsSiga1 <- subset(resultsdds_Interferome_Library.Name_a1_vs_m, pvalue < 0.05)
+ddsSiga1 <- subset(ddsSiga1, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSiga1 <- as.data.frame(ddsSiga1)
+
+dfSiga1 <- vst(dds_Interferome, blind = TRUE)
+dfSiga1 <- dfSiga1 %>% assay(.)
+dfSiga1 <- dfSiga1[rownames(ddsSiga1),] %>% assay(.)
+
+
+
+pdf("Heatmap Interferome all.pdf")
+dfSiga1_clust <- dfSiga1[, rownames(meta_int)[order(meta_int$Library.Name)]]
+pheatmap(dfSiga1_clust, scale="row",main = "Title",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+
+dev.off()
 ```
 
 
 
 ```{r}
 ##Change column names ##Null Unless Wanting Use for downstream analysis
-colnames(raw_herv) <- c('PrEP_1', 'PrEP_2', 'PrEP_3', 'PrEP_4', 'PrEP_5', 'PrEP_6', 'PrEP_7', 'PrEP_8', 'PrEP_9','PrEP_10', 'HIV-1_1', 'PrEP_11', 'HIV-1_2', 'HIV-1_3', 'HIV-1_4', 'HIV-1_5', 'HIV-1_6', 'HIV-1_7', 'HIV-1_8', 'HIV-1_9', 'HIV-1_10', 'HIV-1_11', 'HIV-1_12', 'HIV-1_13', 'HIV-1_14', 'HIV-1_15', 'HIV-1_16', 'HIV-1_17', 'HIV-1_18', 'HIV-1_19', 'PrEP_12', 'PrEP_13')
+#colnames(raw_herv) <- c('PrEP_1', 'PrEP_2', 'PrEP_3', 'PrEP_4', 'PrEP_5', 'PrEP_6', 'PrEP_7', 'PrEP_8', 'PrEP_9','PrEP_10', 'HIV-1_1', 'PrEP_11', 'HIV-1_2', 'HIV-1_3', 'HIV-1_4', 'HIV-1_5', 'HIV-1_6', 'HIV-1_7', 'HIV-1_8', 'HIV-1_9', 'HIV-1_10', 'HIV-1_11', 'HIV-1_12', 'HIV-1_13', 'HIV-1_14', 'HIV-1_15', 'HIV-1_16', 'HIV-1_17', 'HIV-1_18', 'HIV-1_19', 'PrEP_12', 'PrEP_13')
 
 ```
 
