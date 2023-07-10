@@ -744,27 +744,96 @@ dev.off()
 ```
 
 ```{r}
+#Plot Contrast Function for Tukey Box and Whisker Plots
+#Line = Median and Dot = Mean
 plot_contrast <- function(count_table, metadata,category, herv, title = "Selected Counts"){
   count_hervs <- cbind(t(count_table[herv,rownames(metadata), drop = FALSE]), metadata[, category,drop = FALSE])
   colnames(count_hervs) <- c("HERV","Category")
-  herv_plot <- ggplot(count_hervs,aes(x = Category, y = HERV, color = Category)) + geom_boxplot(outlier.shape = NA)+ geom_jitter(size = 1, shape=16, position=position_jitter(0.2))+ stat_summary(fun.y=mean, geom="point", shape=19, size=3, color = "red")+xlab(NULL)+ ylab(" Normalized Counts")+ggtitle(title)+theme(plot.title = element_text(size = 15, face = "bold"),axis.title=element_text(size=15,face="bold"),legend.title = element_text(size = 15,face="bold"),axis.text = element_text(size = 15),axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))
+  herv_plot <- ggplot(count_hervs,aes(x = Category, y = HERV, color = Category)) + geom_boxplot(outlier.shape = NA)+ geom_jitter(size = 1, shape=16, position=position_jitter(0.2))+ stat_summary(fun.y=mean)+xlab(NULL)+ ylab(" Normalized Counts")+ggtitle(title)+theme(plot.title = element_text(size = 15, face = "bold"),axis.title=element_text(size=15,face="bold"),legend.title = element_text(size = 15,face="bold"),axis.text = element_text(size = 15),axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))+ theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
   return(print(herv_plot))}
 
 
-pdf("L1FLnI_3q21.1c.pdf")
-dfSigIntMat <- counts(dds_Interferome, normalized = TRUE)
-plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_3q21.1c", title = "L1FLnI_3q21.1c")
-dev.off()
-
-pdf("L1FLnI_3q24w.pdf")
-dfSigIntMat <- counts(dds_Interferome, normalized = TRUE)
-plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_3q24w", title = "L1FLnI_3q24w")
-dev.off()
-
-pdf("HERVH_6q23.1.pdf")
+#Gut Samples
 dtMat <- counts(dds, normalized = TRUE)
+
+
+pdf("Gut_HERVH_6q23.1.pdf", height = 6, width = 4)
 plot_contrast(dtMat, metadata = meta, category = "disease", herv = "HERVH_6q23.1", title = "HERVH_6q23.1")
 dev.off()
+
+pdf("Gut_MER101_2p25.2.pdf", height = 6, width = 4)
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "MER101_2p25.2", title = "MER101_2p25.2")
+dev.off()
+
+pdf("Gut_L1FLnI_1q23.1t.pdf", height = 6, width = 4)
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_1q23.1t", title = "L1FLnI_1q23.1t")
+dev.off()
+
+pdf("Gut_L1FLnI_4p15.32e.pdf", height = 6, width = 4)
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_4p15.32e", title = "L1FLnI_4p15.32e")
+dev.off()
+
+pdf("Gut_L1FLnI_1p31.1l.pdf", height = 6, width = 4)
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_1p31.1l", title = "L1FLnI_1p31.1l")
+dev.off()
+
+pdf("Gut_L1FLnI_8q21.3da.pdf", height = 6, width = 4)
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_8q21.3da", title = "L1FLnI_8q21.3da")
+dev.off()
+
+
+#Interferome
+dfSigIntMat <- counts(dds_Interferome, normalized = TRUE)
+
+pdf("L1FLnI_2p25.2e.pdf", height = 6, width = 5)
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_2p25.2e", title = "L1FLnI_2p25.2e")
+dev.off()
+
+pdf("HERVFH19_2p22.2.pdf", height = 6, width = 5)
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "HERVFH19_2p22.2", title = "HERVFH19_2p22.2")
+dev.off()
+
+pdf("HUERSP3_2p25.2.pdf", height = 6, width = 5)
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "HUERSP3_2p25.2", title = "HUERSP3_2p25.2")
+dev.off()
+
+pdf("L1FLnI_2q37.1e.pdf", height = 6, width = 5)
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_2q37.1e", title = "L1FLnI_2q37.1e")
+dev.off()
+
+pdf("L1FLnI_9p21.1ha.pdf", height = 6, width = 5)
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_9p21.1ha", title = "L1FLnI_9p21.1ha")
+dev.off()
+
+pdf("L1FLnI_21q22.3a.pdf", height = 6, width = 5)
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_21q22.3a", title = "L1FLnI_21q22.3a")
+dev.off()
+
+pdf("HERV4_4q22.1.pdf", height = 6, width = 5)
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "HERV4_4q22.1", title = "HERV4_4q22.1")
+dev.off()
+
+pdf("HERVIP10FH_1q23.1.pdf", height = 6, width = 5)
+dfSigIntMat <- counts(dds_Interferome, normalized = TRUE)
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "HERVIP10FH_1q23.1", title = "HERVIP10FH_1q23.1")
+dev.off()
+
+
+pdf("MER4_16q24.3.pdf", height = 6, width = 5)
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "MER4_16q24.3", title = "MER4_16q24.3")
+dev.off()
+
+pdf("HERVH_9q34.13.pdf", height = 6, width = 5)
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "HERVH_9q34.13", title = "HERVH_9q34.13")
+dev.off()
+
+pdf("L1FLnI_22q11.22b.pdf", height = 6, width = 5)
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_22q11.22b", title = "L1FLnI_22q11.22b")
+dev.off()
+
+
+
 
 ```
 
