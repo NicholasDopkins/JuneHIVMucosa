@@ -628,15 +628,18 @@ dfGut <- vst(dds, blind = TRUE)
 dfGutAll <- dfGut %>% assay(.)
 dfGut <- dfGut[rownames(ddsSig),] %>% assay(.)
 
+#Set color scale to match rest of data (HIVpos=blue, HIVneg=red)
+annot_colors=list(disease=c(HIVneg="#F0978D",HIVpos="#63D7DE"))
+
 pdf("Heatmap gut sig.pdf", height = 6, width = 4)
 dfGut <- dfGut[, rownames(meta)[order(meta$disease)]]
-pheatmap(dfGut, scale="row",main = "HIVneg vs HIVpos Gut Biopsies",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE]) 
+pheatmap(dfGut, annotation_colors=annot_colors, scale="row",main = "HIVneg vs HIVpos Gut Biopsies",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE]) 
 
 dev.off()
 
 pdf("Heatmap gut all.pdf", height = 6, width = 4)
 dfGutAll_clust <- dfGutAll[, rownames(meta)[order(meta$disease)]]
-pheatmap(dfGutAll_clust, scale="row",main = "HIVneg vs HIVpos Gut Biopsies",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE])
+pheatmap(dfGutAll_clust, annotation_colors=annot_colors, scale="row",main = "HIVneg vs HIVpos Gut Biopsies",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE])
 
 dev.off()
 ```
@@ -750,7 +753,7 @@ panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
 
 #Gut Sample Matrix
 dtMat <- counts(dds, normalized = TRUE)
-
+### "MER101_2p25.2" "L1FLnI_1p22.2l" "HARLEQUIN_17q12" "MER4_7q21.2" "L1FLnI_17q12k" "L1FLnI_9p21.1ha" "HERV4_4q22.1"  
 
 pdf("Gut_HERVH_6q23.1.pdf", height = 6, width = 4)
 
@@ -859,4 +862,95 @@ plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv 
 dev.off()
 ```
 
+#Shared TEs between gut and interferome
+```{r}
+### "MER101_2p25.2" "L1FLnI_1p22.2l" "HARLEQUIN_17q12" "MER4_7q21.2" "L1FLnI_17q12k" "L1FLnI_9p21.1ha" "HERV4_4q22.1" 
+#Interferome
+pdf("MER101_2p25.2.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "MER101_2p25.2", title = "MER101_2p25.2")
+
+dev.off()
+
+pdf("L1FLnI_1p22.2l.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_1p22.2l", title = "L1FLnI_1p22.2l")
+
+dev.off()
+
+pdf("HARLEQUIN_17q12.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "HARLEQUIN_17q12", title = "HARLEQUIN_17q12")
+
+dev.off()
+
+pdf("MER4_7q21.2.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "MER4_7q21.2", title = "MER4_7q21.2")
+
+dev.off()
+
+pdf("L1FLnI_17q12k.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_17q12k", title = "L1FLnI_17q12k")
+
+dev.off()
+
+pdf("L1FLnI_9p21.1ha.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_9p21.1ha", title = "L1FLnI_9p21.1ha")
+
+dev.off()
+
+pdf("HERV4_4q22.1.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "HERV4_4q22.1", title = "HERV4_4q22.1")
+
+dev.off()
+
+#Gut
+### "MER101_2p25.2" "L1FLnI_1p22.2l" "HARLEQUIN_17q12" "MER4_7q21.2" "L1FLnI_17q12k" "L1FLnI_9p21.1ha" "HERV4_4q22.1" 
+pdf("Gut_MER101_2p25.2.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "MER101_2p25.2", title = "MER101_2p25.2")
+
+dev.off()
+
+pdf("Gut_L1FLnI_1p22.2l.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_1p22.2l", title = "L1FLnI_1p22.2l")
+
+dev.off()
+
+pdf("Gut_HARLEQUIN_17q12.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "HARLEQUIN_17q12", title = "HARLEQUIN_17q12")
+
+dev.off()
+
+pdf("Gut_MER4_7q21.2.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "MER4_7q21.2", title = "MER4_7q21.2")
+
+dev.off()
+
+pdf("Gut_L1FLnI_17q12k.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_17q12k", title = "L1FLnI_17q12k")
+
+dev.off()
+
+pdf("Gut_L1FLnI_9p21.1ha.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_9p21.1ha", title = "L1FLnI_9p21.1ha")
+
+dev.off()
+
+pdf("Gut_HERV4_4q22.1.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "HERV4_4q22.1", title = "HERV4_4q22.1")
+
+dev.off()
+
+```
 
