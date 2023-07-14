@@ -3,8 +3,8 @@
 #run conda activate stringtie
 read -p "Enter CSV metadata path" metadata
 read -p "Enter column number" colnum
+declare -i colnum
 read -p "Enter condition" cond
-declare -i cond
 echo "$cond + 1"
 file_path="/athena/nixonlab/scratch/projects/JuneHIVMucosa/results/stringtie"
 cd $file_path
