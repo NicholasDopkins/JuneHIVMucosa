@@ -1,0 +1,956 @@
+---
+title: "HIV_HERV"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+## load packages
+```{r}
+library(tidyverse)
+library(data.table)
+library(PCAtools)
+library(dplyr)
+library(matrixStats)
+library(edgeR)
+library(DESeq2)
+library(EnhancedVolcano)
+library(ashr)
+library(cowplot)
+library(ggsci)
+library(ggplot2)
+library(ggpubr)
+library(fgsea)
+library(pheatmap)
+library(scales)
+library(scopetools)
+library(pheatmap)
+library(ggVennDiagram)
+library(dplyr)
+library(magrittr)
+library(reshape)
+```
+
+##Gut Biopses
+
+```{r}
+##Set to personal directory
+setwd("D:\\Nixon Lab/HERV Gut - interferome Mario Paper/RDirectory/HIV_HERV/")
+###########Scopetools##################################
+####Create a list of sample names
+
+sam_names_dir <- gsub(paste("Raw Data/telescope1/","\\/",sep = ""),"",list.dirs("Raw Data/telescope1/"))[-1]
+
+####load_telescope_reports - files: give a list of paths that contain the telescope reports, colnames: column names 
+raw_herv <- load_telescope_reports(files = paste("Raw Data/telescope1/",sam_names_dir,"/",sam_names_dir,".tsv", sep = ""), colnames = sam_names_dir)
+
+
+##filter lowly abundant retrotransposons
+cutoff.count <- 2
+cutoff.sample <- floor(ncol(raw_herv) * 0.1)
+raw_herv <- raw_herv[rowSums(raw_herv > cutoff.count) > cutoff.sample, ]
+raw_herv <- raw_herv[!(row.names(raw_herv) %in% "__no_feature"),]
+```
+
+##DESEQ2 Gut Biopses
+
+```{r}
+ddsf <- read.csv(file = "PRJNA558500MetaData.csv")
+ddsf[which(ddsf$disease == ""),"disease"] <- "HIVneg"
+ddsf[which(ddsf$disease == "HIV-1"),"disease"] <- "HIVpos"
+dds <- DESeqDataSetFromMatrix(countData = raw_herv, colData = ddsf, design = ~ disease)
+dds$disease <- relevel(dds$disease, ref = "HIVneg")
+dds <- DESeq(dds)
+resultsNames(dds)
+
+##disease_HIVpos_vs_HIVneg.
+
+resultsdds <- results(dds, name = "disease_HIVpos_vs_HIVneg")
+```
+
+##Make Volcano Plot Gut Biopses
+
+```{r}
+pdf("HIV+ vs HIV-.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds, lab = rownames(resultsdds), x = 'log2FoldChange', y = 'padj', title = 'HIVneg vs HIVpos Gut Biopsies', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', xlim = c(-5, 5), ylim = c(0, 20))
+
+dev.off()
+
+```
+
+##Make PCA Gut Biopses
+
+```{r}
+vst <- assay(vst(dds))
+p <- pca(vst, metadata = colData(dds), removeVar = 0.1)
+
+pdf("SCREE plot.pdf")
+screeplot(p, axisLabSize = 10, titleLabSize = 22)
+
+dev.off()
+
+pdf("biplot.pdf")
+biplot(p, lab = p$disease, labSize = 2, pointSize = 2, colby = 'disease', legendTitleSize = 0, showLoadingsNames = TRUE, legendPosition = 'right', encircle = TRUE, xlim = c(-50,50), ylim = c(-60,60), title = 'HIVneg vs HIVpos Gut Biopsies') 
+
+dev.off()
+```
+
+##Summary Data Bar Charts Function
+```{r}
+#count_mat: the count matrix; meta = metadata; annotation = TE or gene annotation, the summary category table to build stack plot from; category = the category from annotation table to summarize from; cont = the contrast group from matadata
+annotation <- read.delim("TE_annotation.v2.0.tsv", row.names = 1)
+meta <- metadata.csv
+rownames(meta) <- meta$`ï..Run`
+meta[which(meta$disease == ""),"disease"] <- "HIVneg"
+meta[which(meta$disease == "HIV-1"),"disease"] <- "HIVpos"
+  
+abundance_sum <- function(count_mat,meta, annotation, category, cont = "disease"){
+  sum_table <- data.frame(matrix(ncol = 5))
+  colnames(sum_table) <- c(cont, category, "Count","PCT","AvgCount")
+  e.te.annot <- annotation[rownames(count_mat),,drop = FALSE]
+  e.te.annot$ids <- rownames(e.te.annot)
+  meta$ids <- rownames(meta)
+  for(trait in unique(meta[,cont])){
+    sample_sub <- meta[which(meta[,cont] == trait),"ids"]
+    #print(sample_sub)
+    for(sub_cat in unique(e.te.annot[,category])){
+      #print(which(e.te.annot[,category] == sub_cat))
+      sub_cat_rows <- e.te.annot[which(e.te.annot[,category] == sub_cat),"ids"]
+      #print(sub_cat_rows[1])
+      count_mat_sub_rows <- count_mat[sub_cat_rows,sample_sub]
+      #print(count_mat_sub_rows)
+      sum_table[nrow(sum_table) + 1,c(1:3,5)] <- c(trait, sub_cat, sum(count_mat_sub_rows), round(sum(count_mat_sub_rows)/ncol(count_mat_sub_rows),2))
+    }
+    sum_table$Count <- as.numeric(sum_table$Count)
+    sum_table$AvgCount <- as.numeric(sum_table$AvgCount)
+    stat_row_sum <- sum(sum_table[which(sum_table[,cont] == trait),"Count"])
+    sum_table[which(sum_table[,cont] == trait),4] <- round(((sum_table[which(sum_table[,cont] == trait), "Count"])/stat_row_sum)*100,2)
+  }
+  sum_table <- sum_table[-1,]
+  return(sum_table)
+}
+```
+
+##Run Function
+
+```{r}
+herv_Category <- abundance_sum(count_mat = raw_herv,meta = meta, annotation = annotation, category = "Category", cont = "disease")
+
+herv_Class <- abundance_sum(count_mat = raw_herv,meta = meta, annotation = annotation, category = "Class", cont = "disease")
+
+herv_Chrom<- abundance_sum(count_mat = raw_herv,meta = meta, annotation = annotation, category = "Chrom", cont = "disease")
+
+TE_type <- abundance_sum(count_mat = raw_herv,meta = meta, annotation = annotation, category = "TE_type", cont = "disease")
+
+herv_Family <- abundance_sum(count_mat = raw_herv,meta = meta, annotation = annotation, category = "Family", cont = "disease")
+```
+
+##Plot Summary
+
+```{r}
+#group
+pdf("group_count.pdf", width=3.5, height=4)
+
+ggplot(herv_Category, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Category, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "HERV Category")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#class
+pdf("group_class.pdf", width=3.5, height=4)
+
+ggplot(herv_Class, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Class, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Class")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#chrom
+pdf("group_chrom.pdf", width=4.5, height=4)
+
+ggplot(herv_Chrom, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Chrom, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Chrom")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#TE_type
+pdf("TE_type.pdf", width=3.5, height=4)
+
+ggplot(TE_type, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(TE_type, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE type")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#Family
+pdf("TE Family.pdf", width=4.5, height=4)
+
+ggplot(herv_Family, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Family, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Family")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#groupPCT
+pdf("group_count_pct.pdf", width=3.5, height=4)
+
+ggplot(herv_Category, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Category, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "HERV Category")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#classPCT
+pdf("group_class_pct.pdf", width=3.5, height=4)
+
+ggplot(herv_Class, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Class, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Class")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#chromPCT
+pdf("group_chrom_pct.pdf", width=4.5, height=4)
+
+ggplot(herv_Chrom, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Chrom, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Chrom")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#TE_typePCT
+pdf("TE_type_pct.pdf", width=3.5, height=4)
+
+ggplot(TE_type, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(TE_type, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE type")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#familyPCT
+pdf("TE_family_pct.pdf", width=4.5, height=4)
+
+ggplot(herv_Family, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Family, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Family")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+```
+
+
+##Interferome
+
+```{r}
+####Create a list of sample names
+sam_names_dir_interferome <- gsub(paste("Raw Data Interferome/telescope1/","\\/",sep = ""),"",list.dirs("Raw Data Interferome/telescope1/"))[-1]
+
+####load_telescope_reports - files: give a list of paths that contain the telescope reports, colnames: column names 
+raw_herv_interferome <- load_telescope_reports(files = paste("Raw Data Interferome/telescope1/", sam_names_dir_interferome,"/",sam_names_dir_interferome,".tsv", sep = ""), colnames = sam_names_dir_interferome)
+
+##filter lowly abundant retrotransposons
+cutoff.count <- 2
+cutoff.sample <- floor(ncol(raw_herv_interferome) * 0.1)
+raw_herv_interferome <- raw_herv_interferome[rowSums(raw_herv_interferome > cutoff.count) > cutoff.sample, ]
+raw_herv_interferome <- raw_herv_interferome[!(row.names(raw_herv_interferome) %in% "__no_feature"),]
+```
+
+
+##Summary Data Bar Charts Interferome
+
+```{r}
+#count_mat: the count matrix; meta = metadata; annotation = TE or gene annotation, the summary category table to build stack plot from; category = the category from annotation table to summarize from; cont = the contrast group from matadata
+meta_int <- ddsf_Interferome
+rownames(meta_int) <- meta_int$`ï..Run`
+
+  
+abundance_sum_int <- function(count_mat,meta, annotation, category, cont = "Library.Name"){
+  sum_table <- data.frame(matrix(ncol = 5))
+  colnames(sum_table) <- c(cont, category, "Count","PCT","AvgCount")
+  e.te.annot <- annotation[rownames(count_mat),,drop = FALSE]
+  e.te.annot$ids <- rownames(e.te.annot)
+  meta$ids <- rownames(meta)
+  for(trait in unique(meta[,cont])){
+    sample_sub <- meta[which(meta[,cont] == trait),"ids"]
+    #print(sample_sub)
+    for(sub_cat in unique(e.te.annot[,category])){
+      #print(which(e.te.annot[,category] == sub_cat))
+      sub_cat_rows <- e.te.annot[which(e.te.annot[,category] == sub_cat),"ids"]
+      #print(sub_cat_rows[1])
+      count_mat_sub_rows <- count_mat[sub_cat_rows,sample_sub]
+      #print(count_mat_sub_rows)
+      sum_table[nrow(sum_table) + 1,c(1:3,5)] <- c(trait, sub_cat, sum(count_mat_sub_rows), round(sum(count_mat_sub_rows)/ncol(count_mat_sub_rows),2))
+    }
+    sum_table$Count <- as.numeric(sum_table$Count)
+    sum_table$AvgCount <- as.numeric(sum_table$AvgCount)
+    stat_row_sum <- sum(sum_table[which(sum_table[,cont] == trait),"Count"])
+    sum_table[which(sum_table[,cont] == trait),4] <- round(((sum_table[which(sum_table[,cont] == trait), "Count"])/stat_row_sum)*100,2)
+  }
+  sum_table <- sum_table[-1,]
+  return(sum_table)
+}
+```
+
+##Run Function Interferome
+
+```{r}
+herv_Category_int <- abundance_sum_int(count_mat = raw_herv_interferome,meta = meta_int, annotation = annotation, category = "Category", cont = "Library.Name")
+
+herv_Class_int <- abundance_sum_int(count_mat = raw_herv_interferome,meta = meta_int, annotation = annotation, category = "Class", cont = "Library.Name")
+
+herv_Chrom_int <- abundance_sum_int(count_mat = raw_herv_interferome,meta = meta_int, annotation = annotation, category = "Chrom", cont = "Library.Name")
+
+TE_type_int <- abundance_sum_int(count_mat = raw_herv_interferome,meta = meta_int, annotation = annotation, category = "TE_type", cont = "Library.Name")
+
+TE_Family_int <- abundance_sum_int(count_mat = raw_herv_interferome,meta = meta_int, annotation = annotation, category = "Family", cont = "Library.Name")
+```
+
+##Plot Summary Interferome
+
+```{r}
+#group
+pdf("group_count_int.pdf", width=4, height=4)
+
+ggplot(herv_Category_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = AvgCount, fill = reorder(Category, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "HERV Category")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#class
+pdf("group_class_int.pdf", width=4, height=4)
+ggplot(herv_Class_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5","a8", "a14", "b")), y = AvgCount, fill = reorder(Class, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "HERV Class")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#chrom
+pdf("group_chrom_int.pdf", width=5, height=4)
+
+ggplot(herv_Chrom_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = AvgCount, fill = reorder(Chrom, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "Chrom")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#TE_type
+pdf("TE_type_int.pdf", width=4, height=4)
+ggplot(TE_type_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = AvgCount, fill = reorder(TE_type, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE_type")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#family
+pdf("TE_Family_int.pdf", width=5, height=4)
+
+ggplot(TE_Family_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = AvgCount, fill = reorder(Family, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Family")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#groupPCT
+pdf("group_count_int_pct.pdf", width=4, height=4)
+
+ggplot(herv_Category_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = PCT, fill = reorder(Category, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "HERV Category")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#classPCT
+pdf("group_class_int_pct.pdf", width=4, height=4)
+ggplot(herv_Class_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = PCT, fill = reorder(Class, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "HERV Class")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#chromPCT
+pdf("group_chrom_int_pct.pdf", width=5, height=4)
+ggplot(herv_Chrom_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = PCT, fill = reorder(Chrom, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "Chrom")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#TE_typePCT
+pdf("TE_type_int_pct.pdf", width=4, height=4)
+ggplot(TE_type_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = PCT, fill = reorder(TE_type, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE_type")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+
+#family
+pdf("TE_Family_int_pct.pdf", width=5, height=4)
+
+ggplot(TE_Family_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = PCT, fill = reorder(Family, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Family")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+
+dev.off()
+```
+
+##DESEQ2 Interferome
+```{r}
+ddsf_Interferome <- read.csv(file = "PRJNA558974MetaData.csv")
+rownames(ddsf_Interferome) <- ddsf_Interferome$ï..Run
+dds_Interferome <- DESeqDataSetFromMatrix(countData = raw_herv_interferome[, rownames(ddsf_Interferome)], colData = ddsf_Interferome, design = ~ Library.Name)
+#dds_Interferome$Library.Name <- relevel(dds_Interferome$Library.Name, ref = "m")
+dds_Interferome <- DESeq(dds_Interferome, parallel = T, betaPrior = T)
+resultsNames(dds_Interferome)
+
+##disease_"Library.Name_a1_vs_m"  "Library.Name_a14_vs_m" "Library.Name_a2_vs_m"  "Library.Name_a5_vs_m" "Library.Name_a8_vs_m"  "Library.Name_b_vs_m" 
+```
+
+##Make Volcano Plot Library.Name_a1_vs_m
+
+```{r}
+#Null , xlim = c(, ), ylim = c(,) can be added for preference
+
+resultsdds_Interferome_Library.Name_a1_vs_m <- results(dds_Interferome, contrast=c("Library.Name", "a1", "m"))
+
+pdf("Library.Name_a1_vs_m.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a1_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a1_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa1', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold')
+
+dev.off()
+```
+
+##Make Volcano Plot Library.Name_a14_vs_m
+
+```{r}
+
+resultsdds_Interferome_Library.Name_a14_vs_m <- results(dds_Interferome, contrast=c("Library.Name", "a14", "m"))
+
+pdf("Library.Name_a14_vs_m.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a14_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a14_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa14', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold')
+
+dev.off()
+```
+
+##Make Volcano Plot Library.Name_a2_vs_m
+
+```{r}
+resultsdds_Interferome_Library.Name_a2_vs_m <- results(dds_Interferome, contrast=c("Library.Name", "a2", "m"))
+
+pdf("Library.Name_a2_vs_m.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a2_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a2_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa2', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold')
+
+dev.off()
+```
+
+##Make Volcano Plot Library.Name_a5_vs_m
+
+```{r}
+resultsdds_Interferome_Library.Name_a5_vs_m <- results(dds_Interferome, contrast=c("Library.Name", "a5", "m"))
+
+pdf("Library.Name_a5_vs_m.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a5_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a5_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa5', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold')
+
+dev.off()
+```
+
+##Make Volcano Plot Library.Name_a8_vs_m
+
+```{r}
+resultsdds_Interferome_Library.Name_a8_vs_m <- results(dds_Interferome, contrast=c("Library.Name", "a8", "m"))
+
+pdf("Library.Name_a8_vs_m.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a8_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a8_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa8', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold')
+
+dev.off()
+```
+
+##Make Volcano Plot Library.Name_b_vs_m
+
+```{r}
+resultsdds_Interferome_Library.Name_b_vs_m <- results(dds_Interferome, contrast=c("Library.Name", "b", "m"))
+
+pdf("Library.Name_b_vs_m.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_b_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_b_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNb', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold')
+
+dev.off()
+```
+
+##Make PCA Interferome
+
+```{r}
+vst_Interferome <- assay(vst(dds_Interferome))
+p_Interferome <- pca(vst_Interferome, metadata = colData(dds_Interferome), removeVar = 0.1)
+
+pdf("SCREE plot_Interferome.pdf")
+screeplot(p_Interferome, axisLabSize = 10, titleLabSize = 22)
+
+dev.off()
+
+pdf("biplot_Interferome.pdf")
+biplot(p_Interferome, lab = p_Interferome$Library.Name, labSize = 2, legendTitleSize = 0, pointSize = 2, colby = 'Library.Name', showLoadingsNames = TRUE, legendPosition = 'right', encircle = TRUE, xlim = c(-50,50), ylim = c(-50,50), title = 'IFN Stimulation')
+
+dev.off()
+```
+
+##ggVennDiagram Interferome
+
+```{r}
+#upregulated
+res_herv_pm_a1_vs_m_up <- results(dds_Interferome, independentFiltering = TRUE, contrast = list(c("Library.Namea1"), c("Library.Namem"))) %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= 1) %>%
+    filter(padj <= 0.05) %>%
+    arrange(padj) %>% rownames()
+
+res_herv_pm_a2_vs_m_up <- results(dds_Interferome, independentFiltering = TRUE, contrast = list(c("Library.Namea2"), c("Library.Namem"))) %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= 1) %>%
+    filter(padj <= 0.05) %>%
+    arrange(padj) %>% rownames()
+
+res_herv_pm_a5_vs_m_up <- results(dds_Interferome, independentFiltering = TRUE, contrast = list(c("Library.Namea5"), c("Library.Namem"))) %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= 1) %>%
+    filter(padj <= 0.05) %>%
+    arrange(padj) %>% rownames()
+
+res_herv_pm_a8_vs_m_up <- results(dds_Interferome, independentFiltering = TRUE, contrast = list(c("Library.Namea8"), c("Library.Namem"))) %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= 1) %>%
+    filter(padj <= 0.05) %>%
+    arrange(padj) %>% rownames()
+
+res_herv_pm_a14_vs_m_up <- results(dds_Interferome, independentFiltering = TRUE, contrast = list(c("Library.Namea14"), c("Library.Namem")))%>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= 1) %>%
+    filter(padj <= 0.05) %>%
+    arrange(padj) %>% rownames()
+
+res_herv_pm_b_vs_m_up <- results(dds_Interferome, independentFiltering = TRUE, contrast = list(c("Library.Nameb"), c("Library.Namem"))) %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= 1) %>%
+    filter(padj <= 0.05) %>%
+    arrange(padj) %>% rownames()
+
+#downregulated
+res_herv_pm_a1_vs_m_down <- results(dds_Interferome, independentFiltering = TRUE, contrast = list(c("Library.Namea1"), c("Library.Namem"))) %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange <= -1) %>%
+    filter(padj <= 0.05) %>%
+    arrange(padj) %>% rownames()
+
+res_herv_pm_a2_vs_m_down <- results(dds_Interferome, independentFiltering = TRUE, contrast = list(c("Library.Namea2"), c("Library.Namem"))) %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange <= -1) %>%
+    filter(padj <= 0.05) %>%
+    arrange(padj) %>% rownames()
+
+res_herv_pm_a5_vs_m_down <- results(dds_Interferome, independentFiltering = TRUE, contrast = list(c("Library.Namea5"), c("Library.Namem"))) %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange <= -1) %>%
+    filter(padj <= 0.05) %>%
+    arrange(padj) %>% rownames()
+
+res_herv_pm_a8_vs_m_down <- results(dds_Interferome, independentFiltering = TRUE, contrast = list(c("Library.Namea8"), c("Library.Namem"))) %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange <= -1) %>%
+    filter(padj <= 0.05) %>%
+    arrange(padj) %>% rownames()
+
+res_herv_pm_a14_vs_m_down <- results(dds_Interferome, independentFiltering = TRUE, contrast = list(c("Library.Namea14"), c("Library.Namem"))) %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange <= -1) %>%
+    filter(padj <= 0.05) %>%
+    arrange(padj) %>% rownames()
+
+res_herv_pm_b_vs_m_down <- results(dds_Interferome, independentFiltering = TRUE, contrast = list(c("Library.Nameb"), c("Library.Namem"))) %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange <= -1) %>%
+    filter(padj <= 0.05) %>%
+    arrange(padj) %>% rownames()
+
+#upregulated vs m
+ggVennUp <- list(res_herv_pm_a1_vs_m_up, res_herv_pm_a2_vs_m_up, res_herv_pm_a5_vs_m_up, res_herv_pm_a14_vs_m_up, res_herv_pm_b_vs_m_up)
+
+
+pdf("Upregulated TEs Interferome.pdf")
+
+ggVennDiagram(ggVennUp, label = "count", category.names = c("IFNa1","IFNa2","IFNa5", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#56fb0e")
+
+dev.off()
+
+#downregulated vs m
+ggVennDown <- list(res_herv_pm_a1_vs_m_down, res_herv_pm_a2_vs_m_down, res_herv_pm_a5_vs_m_down, res_herv_pm_a14_vs_m_down, res_herv_pm_b_vs_m_down)
+
+pdf("Downregulated TEs Interferome.pdf")
+
+ggVennDiagram(ggVennDown, label = "count", category.names = c("IFNa1","IFNa2","IFNa5", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#ff2f2f")
+
+dev.off()
+```
+
+##ggVennDiagram HIV+Int
+
+```{r}
+res_HIV_up <- resultsdds %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange >= 1) %>%
+    filter(padj <= 0.05) %>%
+    arrange(padj) %>% rownames()
+
+res_HIV_down <- resultsdds %>% as.data.frame(.)  %>% dplyr::select(everything()) %>%
+    filter(log2FoldChange <= -1) %>%
+    filter(padj <= 0.05) %>%
+    arrange(padj) %>% rownames()
+
+VennDown <- list(res_HIV_down, res_herv_pm_a1_vs_m_down, res_herv_pm_a2_vs_m_down, res_herv_pm_a5_vs_m_down, res_herv_pm_a14_vs_m_down, res_herv_pm_b_vs_m_down)
+
+VennUp <- list(res_HIV_up, res_herv_pm_a1_vs_m_up, res_herv_pm_a2_vs_m_up, res_herv_pm_a5_vs_m_up, res_herv_pm_a14_vs_m_up, res_herv_pm_b_vs_m_up)
+
+pdf("Downregulated TEs Venn.pdf")
+
+ggVennDiagram(VennDown, label = "count", category.names = c("HIV gut biopses", "IFNa1","IFNa2","IFNa5", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#ff2f2f")
+
+dev.off()
+
+pdf("Upregulated TEs Venn.pdf")
+
+ggVennDiagram(VennUp, label = "count", category.names = c("HIV gut biopses", "IFNa1","IFNa2","IFNa5", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#56fb0e")
+
+dev.off()
+```
+
+#Create List of shared TEs across datasets
+
+```{r}
+##Export List of Shared TEs
+
+all_up <- Reduce(intersect,VennUp)
+
+##all_up (List of 7)
+## "MER101_2p25.2" "L1FLnI_1p22.2l" "HARLEQUIN_17q12" "MER4_7q21.2" "L1FLnI_17q12k" "L1FLnI_9p21.1ha" "HERV4_4q22.1"  
+
+all_down <- Reduce(intersect,VennDown)
+
+##all_down (List of 0)
+
+Int_up <- Reduce(intersect,ggVennUp)
+
+##Int_up (List of 24)
+## "L1FLnI_2p25.2e"    "HUERSP3_2p25.2"    "HERVFH19_2p22.2"   "L1FLnI_9p21.1ha"   "L1FLnI_21q22.3a"   "HERV4_4q22.1"      "L1FLnI_2q37.1e"    "L1FLnI_12q24.13b"  "L1FLnI_3q21.1c"    "L1FLnI_7q21.2o"    "HARLEQUIN_17q12"   "HERVIP10FH_1q23.1" "MER101_2p25.2"     "L1FLnI_4q28.2l"    "MER4_7q21.2"       "L1FLnI_17q12k"     "L1FLnI_4q32.3da"   "MER4_22q12.3"     "L1FLnI_1p22.2l"    "L1FLnI_11q22.2b"   "L1FLnI_7q21.2p"    "L1FLnI_4q28.2h"    "HERVL74_17q12"     "L1FLnI_1p22.2j"
+
+Int_down <- Reduce(intersect,ggVennDown)
+
+##Int_down (List of 0)
+```
+
+
+##Heatmaps Gut
+
+```{r}
+ddsSig <- subset(resultsdds, padj < 0.05)
+ddsSig <- subset(ddsSig, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSig <- as.data.frame(ddsSig)
+
+dfGut <- vst(dds, blind = TRUE)
+dfGutAll <- dfGut %>% assay(.)
+dfGut <- dfGut[rownames(ddsSig),] %>% assay(.)
+
+#Set color scale to match rest of data (HIVpos=blue, HIVneg=red)
+annot_colors=list(disease=c(HIVneg="#F0978D",HIVpos="#63D7DE"))
+
+pdf("Heatmap gut sig.pdf", height = 6, width = 4)
+dfGut <- dfGut[, rownames(meta)[order(meta$disease)]]
+pheatmap(dfGut, annotation_colors=annot_colors, scale="row",main = "HIVneg vs HIVpos Gut Biopsies",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE]) 
+
+dev.off()
+
+pdf("Heatmap gut all.pdf", height = 6, width = 4)
+dfGutAll_clust <- dfGutAll[, rownames(meta)[order(meta$disease)]]
+pheatmap(dfGutAll_clust, annotation_colors=annot_colors, scale="row",main = "HIVneg vs HIVpos Gut Biopsies",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE])
+
+dev.off()
+```
+
+##Heatmap Interferome all
+
+```{r}
+#Subset genes from DESEQ data for individual heatmaps
+ddsSiga1 <- subset(results(dds_Interferome, contrast=c("Library.Name", "a1", "m")), padj < 0.05)
+ddsSiga1 <- subset(ddsSiga1, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSiga1 <- as.data.frame(ddsSiga1)
+
+ddsSiga2<- subset(results(dds_Interferome, contrast=c("Library.Name", "a2", "m")), padj < 0.05)
+ddsSiga2 <- subset(ddsSiga2, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSiga2 <- as.data.frame(ddsSiga2)
+
+ddsSiga5<- subset(results(dds_Interferome, contrast=c("Library.Name", "a5", "m")), padj < 0.05)
+ddsSiga5 <- subset(ddsSiga5, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSiga5 <- as.data.frame(ddsSiga5)
+
+ddsSiga8<- subset(results(dds_Interferome, contrast=c("Library.Name", "a8", "m")), padj < 0.05)
+ddsSiga8 <- subset(ddsSiga8, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSiga8 <- as.data.frame(ddsSiga8)
+
+ddsSiga14<- subset(results(dds_Interferome, contrast=c("Library.Name", "a14", "m")), padj < 0.05)
+ddsSiga14 <- subset(ddsSiga14, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSiga14 <- as.data.frame(ddsSiga14)
+
+ddsSigb<- subset(results(dds_Interferome, contrast=c("Library.Name", "b", "m")), padj < 0.05)
+ddsSigb <- subset(ddsSigb, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSigb <- as.data.frame(ddsSigb)
+
+#VSTransform data
+dfSigInt <- vst(dds_Interferome, blind = TRUE)
+dfSigAll <- dfSigInt %>% assay(.)
+
+#Subset data to plot
+dfSiga1 <- dfSigInt[rownames(ddsSiga1),] %>% assay(.)
+
+dfSiga2 <- dfSigInt[rownames(ddsSiga2),] %>% assay(.)
+
+dfSiga5 <- dfSigInt[rownames(ddsSiga5),] %>% assay(.)
+
+dfSiga8 <- dfSigInt[rownames(ddsSiga8),] %>% assay(.)
+
+dfSiga14 <- dfSigInt[rownames(ddsSiga14),] %>% assay(.)
+
+dfSigb <- dfSigInt[rownames(ddsSigb),] %>% assay(.)
+
+pdf("Heatmap Interferome all.pdf", height = 6, width = 4)
+dfSigAll_clust <- dfSigAll[, rownames(meta_int)[order(meta_int$Library.Name)]]
+pheatmap(dfSigAll_clust, scale="row",main = "Title",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+
+dev.off()
+
+pdf("Heatmap Interferome a1.pdf", height = 6, width = 3)
+dfSiga1_clust <- dfSiga1[, rownames(meta_int)[order(meta_int$Library.Name)]]
+dfSiga1_clust <- data.frame(dfSiga1_clust[, c("SRR9904874", "SRR9904876", "SRR9904885", "SRR9904875", "SRR9904882", "SRR9904877")])
+pheatmap(dfSiga1_clust, scale="row",main = "Title",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+
+dev.off()
+
+pdf("Heatmap Interferome a2.pdf", height = 6, width = 4)
+dfSiga2_clust <- dfSiga2[, rownames(meta_int)[order(meta_int$Library.Name)]]
+dfSiga2_clust <- data.frame(dfSiga2_clust[, c("SRR9904873", "SRR9904879", "SRR9904884", "SRR9904875", "SRR9904882", "SRR9904877")])
+pheatmap(dfSiga2_clust, scale="row",main = "Title",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+
+dev.off()
+
+pdf("Heatmap Interferome a5.pdf", height = 6, width = 4)
+dfSiga5_clust <- dfSiga5[, rownames(meta_int)[order(meta_int$Library.Name)]]
+dfSiga5_clust <- data.frame(dfSiga5_clust[, c("SRR9904871", "SRR9904872", "SRR9904878", "SRR9904875", "SRR9904882", "SRR9904877")])
+pheatmap(dfSiga5_clust, scale="row",main = "Title",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+
+dev.off()
+
+pdf("Heatmap Interferome a8.pdf", height = 6, width = 4)
+dfSiga8_clust <- dfSiga8[, rownames(meta_int)[order(meta_int$Library.Name)]]
+dfSiga8_clust <- data.frame(dfSiga8_clust[, c("SRR9904867", "SRR9904881", "SRR9904870", "SRR9904875", "SRR9904882", "SRR9904877")])
+pheatmap(dfSiga8_clust, scale="row",main = "Title",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+
+dev.off()
+
+pdf("Heatmap Interferome a14.pdf", height = 6, width = 4)
+dfSiga14_clust <- dfSiga14[, rownames(meta_int)[order(meta_int$Library.Name)]]
+dfSiga14_clust <- data.frame(dfSiga14_clust[, c("SRR9904866", "SRR9904869", "SRR9904880", "SRR9904875", "SRR9904882", "SRR9904877")])
+pheatmap(dfSiga14_clust, scale="row",main = "Title",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+
+dev.off()
+
+pdf("Heatmap Interferome b.pdf", height = 6, width = 4)
+dfSigb_clust <- dfSigb[, rownames(meta_int)[order(meta_int$Library.Name)]]
+dfSigb_clust <- data.frame(dfSigb_clust[, c("SRR9904886", "SRR9904883", "SRR9904868", "SRR9904875", "SRR9904882", "SRR9904877")])
+pheatmap(dfSigb_clust, scale="row",main = "Title",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+
+dev.off()
+```
+
+##Boxplots
+
+```{r}
+#Plot Contrast Function for Tukey Box and Whisker Plots
+#Line = Median and Dot = Mean
+plot_contrast <- function(count_table, metadata,category, herv, title = "Selected Counts"){
+  count_hervs <- cbind(t(count_table[herv,rownames(metadata), drop = FALSE]), metadata[, category,drop = FALSE])
+  colnames(count_hervs) <- c("HERV","Category")
+  herv_plot <- ggplot(count_hervs,aes(x = Category, y = HERV, color = Category)) + geom_boxplot(outlier.shape = NA)+ geom_jitter(size = 1, shape=16, position=position_jitter(0.2))+ stat_summary(fun.y=mean)+xlab(NULL)+ ylab(" Normalized Counts")+ggtitle(title)+theme(plot.title = element_text(size = 15, face = "bold"),axis.title=element_text(size=15,face="bold"),legend.title = element_text(size = 15,face="bold"),axis.text = element_text(size = 15),axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))+ theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+  return(print(herv_plot))}
+
+
+#Gut Sample Matrix
+dtMat <- counts(dds, normalized = TRUE)
+### "MER101_2p25.2" "L1FLnI_1p22.2l" "HARLEQUIN_17q12" "MER4_7q21.2" "L1FLnI_17q12k" "L1FLnI_9p21.1ha" "HERV4_4q22.1"  
+
+pdf("Gut_HERVH_6q23.1.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "HERVH_6q23.1", title = "HERVH_6q23.1")
+
+dev.off()
+
+pdf("Gut_MER101_2p25.2.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "MER101_2p25.2", title = "MER101_2p25.2")
+
+dev.off()
+
+pdf("Gut_L1FLnI_1q23.1t.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_1q23.1t", title = "L1FLnI_1q23.1t")
+
+dev.off()
+
+pdf("Gut_L1FLnI_4p15.32e.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_4p15.32e", title = "L1FLnI_4p15.32e")
+
+dev.off()
+
+pdf("Gut_L1FLnI_1p31.1l.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_1p31.1l", title = "L1FLnI_1p31.1l")
+
+dev.off()
+
+pdf("Gut_L1FLnI_8q21.3da.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_8q21.3da", title = "L1FLnI_8q21.3da")
+
+dev.off()
+
+
+#Interferome Matrix
+dfSigIntMat <- counts(dds_Interferome, normalized = TRUE)
+
+pdf("L1FLnI_2p25.2e.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_2p25.2e", title = "L1FLnI_2p25.2e")
+
+dev.off()
+
+pdf("HERVFH19_2p22.2.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "HERVFH19_2p22.2", title = "HERVFH19_2p22.2")
+
+dev.off()
+
+pdf("HUERSP3_2p25.2.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "HUERSP3_2p25.2", title = "HUERSP3_2p25.2")
+
+dev.off()
+
+pdf("L1FLnI_2q37.1e.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_2q37.1e", title = "L1FLnI_2q37.1e")
+
+dev.off()
+
+pdf("L1FLnI_9p21.1ha.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_9p21.1ha", title = "L1FLnI_9p21.1ha")
+
+dev.off()
+
+pdf("L1FLnI_21q22.3a.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_21q22.3a", title = "L1FLnI_21q22.3a")
+
+dev.off()
+
+pdf("HERV4_4q22.1.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "HERV4_4q22.1", title = "HERV4_4q22.1")
+
+dev.off()
+
+pdf("HERVIP10FH_1q23.1.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "HERVIP10FH_1q23.1", title = "HERVIP10FH_1q23.1")
+
+dev.off()
+
+pdf("MER4_16q24.3.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "MER4_16q24.3", title = "MER4_16q24.3")
+
+dev.off()
+
+pdf("HERVH_9q34.13.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "HERVH_9q34.13", title = "HERVH_9q34.13")
+
+dev.off()
+
+pdf("L1FLnI_22q11.22b.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_22q11.22b", title = "L1FLnI_22q11.22b")
+
+dev.off()
+```
+
+#Shared TEs between gut and interferome
+```{r}
+### "MER101_2p25.2" "L1FLnI_1p22.2l" "HARLEQUIN_17q12" "MER4_7q21.2" "L1FLnI_17q12k" "L1FLnI_9p21.1ha" "HERV4_4q22.1" 
+#Interferome
+pdf("MER101_2p25.2.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "MER101_2p25.2", title = "MER101_2p25.2")
+
+dev.off()
+
+pdf("L1FLnI_1p22.2l.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_1p22.2l", title = "L1FLnI_1p22.2l")
+
+dev.off()
+
+pdf("HARLEQUIN_17q12.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "HARLEQUIN_17q12", title = "HARLEQUIN_17q12")
+
+dev.off()
+
+pdf("MER4_7q21.2.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "MER4_7q21.2", title = "MER4_7q21.2")
+
+dev.off()
+
+pdf("L1FLnI_17q12k.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_17q12k", title = "L1FLnI_17q12k")
+
+dev.off()
+
+pdf("L1FLnI_9p21.1ha.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_9p21.1ha", title = "L1FLnI_9p21.1ha")
+
+dev.off()
+
+pdf("HERV4_4q22.1.pdf", height = 6, width = 5)
+
+plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "HERV4_4q22.1", title = "HERV4_4q22.1")
+
+dev.off()
+
+#Gut
+### "MER101_2p25.2" "L1FLnI_1p22.2l" "HARLEQUIN_17q12" "MER4_7q21.2" "L1FLnI_17q12k" "L1FLnI_9p21.1ha" "HERV4_4q22.1" 
+pdf("Gut_MER101_2p25.2.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "MER101_2p25.2", title = "MER101_2p25.2")
+
+dev.off()
+
+pdf("Gut_L1FLnI_1p22.2l.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_1p22.2l", title = "L1FLnI_1p22.2l")
+
+dev.off()
+
+pdf("Gut_HARLEQUIN_17q12.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "HARLEQUIN_17q12", title = "HARLEQUIN_17q12")
+
+dev.off()
+
+pdf("Gut_MER4_7q21.2.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "MER4_7q21.2", title = "MER4_7q21.2")
+
+dev.off()
+
+pdf("Gut_L1FLnI_17q12k.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_17q12k", title = "L1FLnI_17q12k")
+
+dev.off()
+
+pdf("Gut_L1FLnI_9p21.1ha.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_9p21.1ha", title = "L1FLnI_9p21.1ha")
+
+dev.off()
+
+pdf("Gut_HERV4_4q22.1.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat, metadata = meta, category = "disease", herv = "HERV4_4q22.1", title = "HERV4_4q22.1")
+
+dev.off()
+
+```
+
