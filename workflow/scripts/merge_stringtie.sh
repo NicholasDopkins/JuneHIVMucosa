@@ -1,6 +1,6 @@
 #! /bin/bash -l
 
-conda activate stringtie
+#run conda activate stringtie
 read -p "Enter CSV metadata path" metadata
 read -p "Enter column number" colnum
 read -p "Enter condition" cond
