@@ -5,6 +5,7 @@ read -p "Enter CSV metadata path" metadata
 read -p "Enter column number" colnum
 read -p "Enter condition" condi
 declare -i cond=$condi
+echo "$cond + 1"
 file_path="/athena/nixonlab/scratch/projects/JuneHIVMucosa/results/stringtie"
 cd $file_path
 cond_samples=$(cat $metadata | awk -F "," '{ if ($colnum =="$cond") print $1}')
