@@ -9,7 +9,7 @@ echo "$colnum + 1"
 file_path="/athena/nixonlab/scratch/projects/JuneHIVMucosa/results/stringtie"
 cd $file_path
 cond_samples=$(cat $metadata | awk -F "," '{ if ($colnum =="$cond") print $1}')
-echo $cond_samples[@]
+echo $cond_samples[1]
 declare sam_list=( "${cond_samples[@]/%//transcripts.gtf}" )
 echo $sam_list
 printf '%s\n' "${hivpos_list[@]}" > {$colnum}_{$cond}.txt
