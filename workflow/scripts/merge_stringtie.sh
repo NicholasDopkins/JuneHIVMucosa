@@ -13,4 +13,4 @@ echo $sam_list
 printf '%s\n' "${hivpos_list[@]}" > {$colnum}_{$cond}.txt
 cat {$colnum}_{$cond}.txt
 mkdir -p {$colnum}_{$cond}
-stringtie --merge -o {$colnum}_{$cond} -G ../../resources/gencode.v38.annotation.gtf {$colnum}_{$cond}.txt
+srun bash -c 'stringtie --merge -o {$colnum}_{$cond} -G ../../resources/gencode.v38.annotation.gtf {$colnum}_{$cond}.txt'
