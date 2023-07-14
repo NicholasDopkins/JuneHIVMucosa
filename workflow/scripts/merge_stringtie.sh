@@ -1,10 +1,4 @@
 #! /bin/bash -l
-#SBATCH --partition=panda
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --job-name=StringTieMerge
-#SBATCH --time=20:00:00 #HH/MM/SS
-#SBATCH --mem=50G
 
 conda activate stringtie
 read -p "Enter CSV metadata path" metadata
