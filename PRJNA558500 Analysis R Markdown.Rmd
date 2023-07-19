@@ -33,6 +33,7 @@ library(ggVennDiagram)
 library(dplyr)
 library(magrittr)
 library(reshape)
+library(RColorBrewer)
 ```
 
 ##Gut Biopses
@@ -155,15 +156,23 @@ herv_Family <- abundance_sum(count_mat = raw_herv,meta = meta, annotation = anno
 #group
 pdf("group_count.pdf", width=3.5, height=4)
 
-ggplot(herv_Category, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Category, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "HERV Category")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(herv_Category, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Category, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "HERV Category")) + scale_fill_brewer(palette="Paired") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
 
+#custom expanded color palette from color brewer "paired" panel
+nb.cols_TE_Family <- 60
+mycolors_TE_Family <- colorRampPalette(brewer.pal(12, "Paired"))(nb.cols_TE_Family)
+
+#custom expanded color palette from color brewer "paired" panel
+nb.cols_Chromosomes <- 35
+mycolors_TE_Chromosomes <- colorRampPalette(brewer.pal(12, "Paired"))(nb.cols_Chromosomes)
+
 #class
 pdf("group_class.pdf", width=3.5, height=4)
 
-ggplot(herv_Class, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Class, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Class")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(herv_Class, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Class, -AvgCount))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Class")) + scale_fill_brewer(palette="Paired")  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
@@ -171,7 +180,7 @@ dev.off()
 #chrom
 pdf("group_chrom.pdf", width=4.5, height=4)
 
-ggplot(herv_Chrom, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Chrom, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Chrom")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(herv_Chrom, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Chrom, -AvgCount))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Chrom"))  + scale_fill_manual(values = mycolors_TE_Chromosomes)  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
@@ -179,7 +188,7 @@ dev.off()
 #TE_type
 pdf("TE_type.pdf", width=3.5, height=4)
 
-ggplot(TE_type, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(TE_type, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE type")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(TE_type, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(TE_type, -AvgCount))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE type")) + scale_fill_brewer(palette="Paired")  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
@@ -187,7 +196,7 @@ dev.off()
 #Family
 pdf("TE Family.pdf", width=4.5, height=4)
 
-ggplot(herv_Family, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Family, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Family")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(herv_Family, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Family, -AvgCount))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Family"))  + scale_fill_manual(values = mycolors_TE_Family) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
@@ -195,7 +204,7 @@ dev.off()
 #groupPCT
 pdf("group_count_pct.pdf", width=3.5, height=4)
 
-ggplot(herv_Category, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Category, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "HERV Category")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(herv_Category, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Category, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "HERV Category")) + scale_fill_brewer(palette="Paired")  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
@@ -203,7 +212,7 @@ dev.off()
 #classPCT
 pdf("group_class_pct.pdf", width=3.5, height=4)
 
-ggplot(herv_Class, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Class, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Class")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(herv_Class, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Class, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Class")) + scale_fill_brewer(palette="Paired")  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
@@ -211,7 +220,7 @@ dev.off()
 #chromPCT
 pdf("group_chrom_pct.pdf", width=4.5, height=4)
 
-ggplot(herv_Chrom, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Chrom, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Chrom")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(herv_Chrom, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Chrom, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Chrom")) + scale_fill_manual(values = mycolors_TE_Chromosomes) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
@@ -219,7 +228,7 @@ dev.off()
 #TE_typePCT
 pdf("TE_type_pct.pdf", width=3.5, height=4)
 
-ggplot(TE_type, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(TE_type, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE type")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(TE_type, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(TE_type, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE type")) + scale_fill_brewer(palette="Paired")  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
@@ -227,7 +236,7 @@ dev.off()
 #familyPCT
 pdf("TE_family_pct.pdf", width=4.5, height=4)
 
-ggplot(herv_Family, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Family, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Family")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(herv_Family, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Family, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Family")) + scale_fill_manual(values = mycolors)  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
@@ -380,6 +389,7 @@ dev.off()
 ```
 
 ##DESEQ2 Interferome
+
 ```{r}
 ddsf_Interferome <- read.csv(file = "PRJNA558974MetaData.csv")
 rownames(ddsf_Interferome) <- ddsf_Interferome$ï..Run
@@ -615,6 +625,13 @@ Int_down <- Reduce(intersect,ggVennDown)
 
 ##Int_down (List of 0)
 ```
+##Heatmap color scheme
+
+```{r}
+
+
+HeatmapColPalette <- RColorBrewer::brewer.pal(11, "PRGn")
+```
 
 
 ##Heatmaps Gut
@@ -633,13 +650,13 @@ annot_colors=list(disease=c(HIVneg="#F0978D",HIVpos="#63D7DE"))
 
 pdf("Heatmap gut sig.pdf", height = 6, width = 4)
 dfGut <- dfGut[, rownames(meta)[order(meta$disease)]]
-pheatmap(dfGut, annotation_colors=annot_colors, scale="row",main = "HIVneg vs HIVpos Gut Biopsies",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE]) 
+pheatmap(dfGut, annotation_colors=annot_colors, scale="row",main = "HIVneg vs HIVpos Gut Biopsies",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE], color = hcl.colors(10000, "RdYlBu"))
 
 dev.off()
 
 pdf("Heatmap gut all.pdf", height = 6, width = 4)
 dfGutAll_clust <- dfGutAll[, rownames(meta)[order(meta$disease)]]
-pheatmap(dfGutAll_clust, annotation_colors=annot_colors, scale="row",main = "HIVneg vs HIVpos Gut Biopsies",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE])
+pheatmap(dfGutAll_clust, annotation_colors=annot_colors, scale="row",main = "HIVneg vs HIVpos Gut Biopsies",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE], color = hcl.colors(10000, "RdYlBu"))
 
 dev.off()
 ```
@@ -691,49 +708,49 @@ dfSigb <- dfSigInt[rownames(ddsSigb),] %>% assay(.)
 
 pdf("Heatmap Interferome all.pdf", height = 6, width = 4)
 dfSigAll_clust <- dfSigAll[, rownames(meta_int)[order(meta_int$Library.Name)]]
-pheatmap(dfSigAll_clust, scale="row",main = "Title",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+pheatmap(dfSigAll_clust, scale="row",main = "Type-I Interferons",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE], color = hcl.colors(10000, "RdYlBu"))
 
 dev.off()
 
 pdf("Heatmap Interferome a1.pdf", height = 6, width = 3)
 dfSiga1_clust <- dfSiga1[, rownames(meta_int)[order(meta_int$Library.Name)]]
 dfSiga1_clust <- data.frame(dfSiga1_clust[, c("SRR9904875", "SRR9904882", "SRR9904877", "SRR9904874", "SRR9904876", "SRR9904885")])
-pheatmap(dfSiga1_clust, scale="row",main = "Title",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+pheatmap(dfSiga1_clust, scale="row",main = "IFN alpha 1",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE], color = hcl.colors(10000, "RdYlBu"))
 
 dev.off()
 
 pdf("Heatmap Interferome a2.pdf", height = 6, width = 4)
 dfSiga2_clust <- dfSiga2[, rownames(meta_int)[order(meta_int$Library.Name)]]
 dfSiga2_clust <- data.frame(dfSiga2_clust[, c("SRR9904875", "SRR9904882", "SRR9904877","SRR9904873", "SRR9904879", "SRR9904884")])
-pheatmap(dfSiga2_clust, scale="row",main = "Title",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+pheatmap(dfSiga2_clust, scale="row",main = "IFN alpha 2",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE], color = hcl.colors(10000, "RdYlBu"))
 
 dev.off()
 
 pdf("Heatmap Interferome a5.pdf", height = 6, width = 4)
 dfSiga5_clust <- dfSiga5[, rownames(meta_int)[order(meta_int$Library.Name)]]
 dfSiga5_clust <- data.frame(dfSiga5_clust[, c("SRR9904875", "SRR9904882", "SRR9904877","SRR9904871", "SRR9904872", "SRR9904878")])
-pheatmap(dfSiga5_clust, scale="row",main = "Title",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+pheatmap(dfSiga5_clust, scale="row",main = "IFN alpha 5",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE], color = hcl.colors(10000, "RdYlBu"))
 
 dev.off()
 
 pdf("Heatmap Interferome a8.pdf", height = 6, width = 4)
 dfSiga8_clust <- dfSiga8[, rownames(meta_int)[order(meta_int$Library.Name)]]
 dfSiga8_clust <- data.frame(dfSiga8_clust[, c("SRR9904875", "SRR9904882", "SRR9904877","SRR9904867", "SRR9904881", "SRR9904870")])
-pheatmap(dfSiga8_clust, scale="row",main = "Title",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+pheatmap(dfSiga8_clust, scale="row",main = "IFN alpha 8",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE], color = hcl.colors(10000, "RdYlBu"))
 
 dev.off()
 
 pdf("Heatmap Interferome a14.pdf", height = 6, width = 4)
 dfSiga14_clust <- dfSiga14[, rownames(meta_int)[order(meta_int$Library.Name)]]
 dfSiga14_clust <- data.frame(dfSiga14_clust[, c("SRR9904875", "SRR9904882", "SRR9904877","SRR9904866", "SRR9904869", "SRR9904880")])
-pheatmap(dfSiga14_clust, scale="row",main = "Title",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+pheatmap(dfSiga14_clust, scale="row",main = "IFN 14",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE], color = hcl.colors(10000, "RdYlBu"))
 
 dev.off()
 
 pdf("Heatmap Interferome b.pdf", height = 6, width = 4)
 dfSigb_clust <- dfSigb[, rownames(meta_int)[order(meta_int$Library.Name)]]
 dfSigb_clust <- data.frame(dfSigb_clust[, c("SRR9904875", "SRR9904882", "SRR9904877","SRR9904886", "SRR9904883", "SRR9904868")])
-pheatmap(dfSigb_clust, scale="row",main = "Title",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE])
+pheatmap(dfSigb_clust, scale="row",main = "IFN beta",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta_int[,"Library.Name",drop = FALSE], color = hcl.colors(10000, "RdYlBu"))
 
 dev.off()
 ```
@@ -746,9 +763,10 @@ dev.off()
 plot_contrast <- function(count_table, metadata,category, herv, title = "Selected Counts"){
   count_hervs <- cbind(t(count_table[herv,rownames(metadata), drop = FALSE]), metadata[, category,drop = FALSE])
   colnames(count_hervs) <- c("HERV","Category")
-  herv_plot <- ggplot(count_hervs,aes(x = Category, y = HERV, color = Category)) + geom_boxplot(outlier.shape = NA)+ geom_jitter(size = 1, shape=16, position=position_jitter(0.2))+ stat_summary(fun.y=mean)+xlab(NULL)+ ylab(" Normalized Counts")+ggtitle(title)+theme(plot.title = element_text(size = 15, face = "bold"),axis.title=element_text(size=15,face="bold"),legend.title = element_text(size = 15,face="bold"),axis.text = element_text(size = 15),axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))+ theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+  herv_plot <- ggplot(count_hervs, aes(x = Category, y = HERV, color = Category)) + geom_boxplot(outlier.shape = NA)+ geom_jitter(size = 1, shape=16, position=position_jitter(0.2))+ stat_summary(fun.y=mean)+xlab(NULL)+ ylab(" Normalized Counts")+ggtitle(title)+theme(plot.title = element_text(size = 15, face = "bold"),axis.title=element_text(size=15,face="bold"),legend.title = element_text(size = 15,face="bold"),axis.text = element_text(size = 15),axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))+ theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
   return(print(herv_plot))}
+
 
 
 #Gut Sample Matrix
@@ -792,8 +810,11 @@ plot_contrast(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_8q21.
 dev.off()
 
 
+
 #Interferome Matrix
 dfSigIntMat <- counts(dds_Interferome, normalized = TRUE)
+#Relevel order to put mock first
+meta_int$Library.Name <- factor(meta_int$Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b"))
 
 pdf("L1FLnI_2p25.2e.pdf", height = 6, width = 5)
 
