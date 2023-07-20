@@ -77,10 +77,20 @@ resultsdds <- results(dds, name = "disease_HIVpos_vs_HIVneg")
 
 ```{r}
 pdf("HIV+ vs HIV-.pdf")
-EnhancedVolcano::EnhancedVolcano(resultsdds, lab = rownames(resultsdds), x = 'log2FoldChange', y = 'padj', title = 'HIVneg vs HIVpos Gut Biopsies', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', xlim = c(-5, 5), ylim = c(0, 20))
+
+keyvals.colour <- ifelse(
+    resultsdds$padj > 0.05, 'black',
+      ifelse(resultsdds$log2FoldChange > 1, '#063970',ifelse(
+             resultsdds$log2FoldChange < -1, '#Ff6300',
+        'black')))
+  keyvals.colourb[is.na(keyvals.colour)] <- 'black'
+  names(keyvals.colour)[keyvals.colour == '#063970'] <- 'Upregulated'
+  names(keyvals.colour)[keyvals.colour == 'black'] <- 'Unchanged'
+  names(keyvals.colour)[keyvals.colour == '#Ff6300'] <- 'Downregulated'
+
+EnhancedVolcano::EnhancedVolcano(resultsdds, lab = rownames(resultsdds), x = 'log2FoldChange', y = 'padj', title = 'HIVneg vs HIVpos Gut Biopsies', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', xlim = c(-4, 4), ylim = c(0, 15), colCustom = keyvals.colour)
 
 dev.off()
-
 ```
 
 ##Make PCA Gut Biopses
@@ -408,10 +418,24 @@ resultsNames(dds_Interferome)
 
 resultsdds_Interferome_Library.Name_a1_vs_m <- results(dds_Interferome, contrast=c("Library.Name", "a1", "m"))
 
+keyvals.coloura1 <- ifelse(
+    resultsdds_Interferome_Library.Name_a1_vs_m$padj > 0.05, 'black',
+      ifelse(resultsdds_Interferome_Library.Name_a1_vs_m$log2FoldChange > 1, '#063970',ifelse(
+             resultsdds_Interferome_Library.Name_a1_vs_m$log2FoldChange < -1, '#Ff6300',
+        'black')))
+  keyvals.coloura1[is.na(keyvals.coloura1)] <- 'black'
+  names(keyvals.coloura1)[keyvals.coloura1 == '#063970'] <- 'Upregulated'
+  names(keyvals.coloura1)[keyvals.coloura1 == 'black'] <- 'Unregulated'
+  names(keyvals.coloura1)[keyvals.coloura1 == '#Ff6300'] <- 'Downregulated'
+  
 pdf("Library.Name_a1_vs_m.pdf")
-EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a1_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a1_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa1', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold')
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a1_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a1_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa1', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', colCustom = keyvals.coloura1)
 
 dev.off()
+
+
+
+
 ```
 
 ##Make Volcano Plot Library.Name_a14_vs_m
@@ -420,8 +444,18 @@ dev.off()
 
 resultsdds_Interferome_Library.Name_a14_vs_m <- results(dds_Interferome, contrast=c("Library.Name", "a14", "m"))
 
+keyvals.coloura14 <- ifelse(
+    resultsdds_Interferome_Library.Name_a14_vs_m$padj > 0.05, 'black',
+      ifelse(resultsdds_Interferome_Library.Name_a14_vs_m$log2FoldChange > 1, '#063970',ifelse(
+             resultsdds_Interferome_Library.Name_a14_vs_m$log2FoldChange < -1, '#Ff6300',
+        'black')))
+  keyvals.coloura14[is.na(keyvals.coloura14)] <- 'black'
+  names(keyvals.coloura14)[keyvals.coloura14 == '#063970'] <- 'Upregulated'
+  names(keyvals.coloura14)[keyvals.coloura14 == 'black'] <- 'Unregulated'
+  names(keyvals.coloura14)[keyvals.coloura14 == '#Ff6300'] <- 'Downregulated'
+
 pdf("Library.Name_a14_vs_m.pdf")
-EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a14_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a14_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa14', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold')
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a14_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a14_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa14', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', colCustom = keyvals.coloura14)
 
 dev.off()
 ```
@@ -431,8 +465,18 @@ dev.off()
 ```{r}
 resultsdds_Interferome_Library.Name_a2_vs_m <- results(dds_Interferome, contrast=c("Library.Name", "a2", "m"))
 
+keyvals.coloura2 <- ifelse(
+    resultsdds_Interferome_Library.Name_a2_vs_m$padj > 0.05, 'black',
+      ifelse(resultsdds_Interferome_Library.Name_a2_vs_m$log2FoldChange > 1, '#063970',ifelse(
+             resultsdds_Interferome_Library.Name_a2_vs_m$log2FoldChange < -1, '#Ff6300',
+        'black')))
+  keyvals.coloura2[is.na(keyvals.coloura2)] <- 'black'
+  names(keyvals.coloura2)[keyvals.coloura2 == '#063970'] <- 'Upregulated'
+  names(keyvals.coloura2)[keyvals.coloura2 == 'black'] <- 'Unchanged'
+  names(keyvals.coloura2)[keyvals.coloura2 == '#Ff6300'] <- 'Downregulated'
+
 pdf("Library.Name_a2_vs_m.pdf")
-EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a2_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a2_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa2', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold')
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a2_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a2_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa2', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', colCustom = keyvals.coloura2)
 
 dev.off()
 ```
@@ -442,8 +486,18 @@ dev.off()
 ```{r}
 resultsdds_Interferome_Library.Name_a5_vs_m <- results(dds_Interferome, contrast=c("Library.Name", "a5", "m"))
 
+keyvals.coloura5 <- ifelse(
+    resultsdds_Interferome_Library.Name_a5_vs_m$padj > 0.05, 'black',
+      ifelse(resultsdds_Interferome_Library.Name_a5_vs_m$log2FoldChange > 1, '#063970',ifelse(
+             resultsdds_Interferome_Library.Name_a5_vs_m$log2FoldChange < -1, '#Ff6300',
+        'black')))
+  keyvals.coloura5[is.na(keyvals.coloura5)] <- 'black'
+  names(keyvals.coloura5)[keyvals.coloura5 == '#063970'] <- 'Upregulated'
+  names(keyvals.coloura5)[keyvals.coloura5 == 'black'] <- 'Unchanged'
+  names(keyvals.coloura5)[keyvals.coloura5 == '#Ff6300'] <- 'Downregulated'
+
 pdf("Library.Name_a5_vs_m.pdf")
-EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a5_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a5_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa5', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold')
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a5_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a5_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa5', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', colCustom = keyvals.coloura5)
 
 dev.off()
 ```
@@ -453,8 +507,18 @@ dev.off()
 ```{r}
 resultsdds_Interferome_Library.Name_a8_vs_m <- results(dds_Interferome, contrast=c("Library.Name", "a8", "m"))
 
+keyvals.coloura8 <- ifelse(
+    resultsdds_Interferome_Library.Name_a2_vs_m$padj > 0.05, 'black',
+      ifelse(resultsdds_Interferome_Library.Name_a8_vs_m$log2FoldChange > 1, '#063970',ifelse(
+             resultsdds_Interferome_Library.Name_a8_vs_m$log2FoldChange < -1, '#Ff6300',
+        'black')))
+  keyvals.coloura8[is.na(keyvals.coloura8)] <- 'black'
+  names(keyvals.coloura8)[keyvals.coloura8 == '#063970'] <- 'Upregulated'
+  names(keyvals.coloura8)[keyvals.coloura8 == 'black'] <- 'Unchanged'
+  names(keyvals.coloura8)[keyvals.coloura8 == '#Ff6300'] <- 'Downregulated'
+
 pdf("Library.Name_a8_vs_m.pdf")
-EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a8_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a8_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa8', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold')
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a8_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a8_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa8', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', colCustom = keyvals.coloura8)
 
 dev.off()
 ```
@@ -464,8 +528,18 @@ dev.off()
 ```{r}
 resultsdds_Interferome_Library.Name_b_vs_m <- results(dds_Interferome, contrast=c("Library.Name", "b", "m"))
 
+keyvals.colourb <- ifelse(
+    resultsdds_Interferome_Library.Name_b_vs_m$padj > 0.05, 'black',
+      ifelse(resultsdds_Interferome_Library.Name_b_vs_m$log2FoldChange > 1, '#063970',ifelse(
+             resultsdds_Interferome_Library.Name_b_vs_m$log2FoldChange < -1, '#Ff6300',
+        'black')))
+  keyvals.colourb[is.na(keyvals.colourb)] <- 'black'
+  names(keyvals.colourb)[keyvals.colourb == '#063970'] <- 'Upregulated'
+  names(keyvals.colourb)[keyvals.colourb == 'black'] <- 'Unchanged'
+  names(keyvals.colourb)[keyvals.colourb == '#Ff6300'] <- 'Downregulated'
+
 pdf("Library.Name_b_vs_m.pdf")
-EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_b_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_b_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNb', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold')
+EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_b_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_b_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNb', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', colCustom = keyvals.colourb)
 
 dev.off()
 ```
