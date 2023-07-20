@@ -4,4 +4,5 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - telescope ==1.0.3
+  - numpy=1.23.5
+  - telescope==1.0.3
