@@ -8,8 +8,7 @@ cond_samples=$(cat "../../resources/RunTable_HIV_mucosal.csv" | awk -F "," '{ if
 echo $cond_samples[1]
 declare sam_list=( "${cond_samples[@]/%//transcripts.gtf}" )
 echo $sam_list
-printf '%s\n' "${hivpos_list[@]}" > {$colnum}_{$cond}.txt
-cat {$colnum}_{$cond}.txt
-mkdir -p {$colnum}_{$cond}
+printf '%s\n' "${sam_list[@]}" > HIV-1.txt
+mkdir -p HIV-1
 #better use a screen -S to have it running in the background
-stringtie --merge -o {$colnum}_{$cond} -G ../../resources/gencode.v38.annotation.gtf {$colnum}_{$cond}.txt
+stringtie --merge -o HIV-1 -G ../../resources/gencode.v38.annotation.gtf HIV-1.txt
