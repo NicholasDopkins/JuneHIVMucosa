@@ -627,25 +627,25 @@ res_herv_pm_b_vs_m_down <- results(dds_Interferome, independentFiltering = TRUE,
     arrange(padj) %>% rownames()
 
 #upregulated vs m
-ggVennUp <- list(res_herv_pm_a1_vs_m_up, res_herv_pm_a2_vs_m_up, res_herv_pm_a5_vs_m_up, res_herv_pm_a14_vs_m_up, res_herv_pm_b_vs_m_up)
+ggVennUp <- list(res_herv_pm_a1_vs_m_up, res_herv_pm_a2_vs_m_up, res_herv_pm_a5_vs_m_up, res_herv_pm_a8_vs_m_up, res_herv_pm_a14_vs_m_up, res_herv_pm_b_vs_m_up)
 
 
 pdf("Upregulated TEs Interferome.pdf")
 
-ggVennDiagram(ggVennUp, label = "count", category.names = c("IFNa1","IFNa2","IFNa5", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#56fb0e")
+ggVennDiagram(ggVennUp, label = "count", category.names = c("IFNa1","IFNa2","IFNa5", "IFNa8", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#063970")
 
 dev.off()
 
 #downregulated vs m
-ggVennDown <- list(res_herv_pm_a1_vs_m_down, res_herv_pm_a2_vs_m_down, res_herv_pm_a5_vs_m_down, res_herv_pm_a14_vs_m_down, res_herv_pm_b_vs_m_down)
+ggVennDown <- list(res_herv_pm_a1_vs_m_down, res_herv_pm_a2_vs_m_down, res_herv_pm_a5_vs_m_down,res_herv_pm_a8_vs_m_down, res_herv_pm_a14_vs_m_down, res_herv_pm_b_vs_m_down)
 
 pdf("Downregulated TEs Interferome.pdf")
 
-ggVennDiagram(ggVennDown, label = "count", category.names = c("IFNa1","IFNa2","IFNa5", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#ff2f2f")
+ggVennDiagram(ggVennDown, label = "count", category.names = c("IFNa1","IFNa2","IFNa5", "IFNa8", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#Ff6300")
 
 dev.off()
 ```
-
+ 
 ##ggVennDiagram HIV+Int
 
 ```{r}
@@ -659,19 +659,19 @@ res_HIV_down <- resultsdds %>% as.data.frame(.)  %>% dplyr::select(everything())
     filter(padj <= 0.05) %>%
     arrange(padj) %>% rownames()
 
-VennDown <- list(res_HIV_down, res_herv_pm_a1_vs_m_down, res_herv_pm_a2_vs_m_down, res_herv_pm_a5_vs_m_down, res_herv_pm_a14_vs_m_down, res_herv_pm_b_vs_m_down)
+VennDown <- list(res_HIV_down, res_herv_pm_a1_vs_m_down, res_herv_pm_a2_vs_m_down, res_herv_pm_a5_vs_m_down, res_herv_pm_a8_vs_m_down, res_herv_pm_a14_vs_m_down, res_herv_pm_b_vs_m_down)
 
-VennUp <- list(res_HIV_up, res_herv_pm_a1_vs_m_up, res_herv_pm_a2_vs_m_up, res_herv_pm_a5_vs_m_up, res_herv_pm_a14_vs_m_up, res_herv_pm_b_vs_m_up)
+VennUp <- list(res_HIV_up, res_herv_pm_a1_vs_m_up, res_herv_pm_a2_vs_m_up, res_herv_pm_a5_vs_m_up, res_herv_pm_a8_vs_m_up, res_herv_pm_a14_vs_m_up, res_herv_pm_b_vs_m_up)
 
 pdf("Downregulated TEs Venn.pdf")
 
-ggVennDiagram(VennDown, label = "count", category.names = c("HIV gut biopses", "IFNa1","IFNa2","IFNa5", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#ff2f2f")
+ggVennDiagram(VennDown, label = "count", category.names = c("HIV gut biopses", "IFNa1","IFNa2","IFNa5", "IFNa8", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#Ff6300")
 
 dev.off()
 
 pdf("Upregulated TEs Venn.pdf")
 
-ggVennDiagram(VennUp, label = "count", category.names = c("HIV gut biopses", "IFNa1","IFNa2","IFNa5", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#56fb0e")
+ggVennDiagram(VennUp, label = "count", category.names = c("HIV gut biopses", "IFNa1","IFNa2","IFNa5", "IFNa8", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#063970")
 
 dev.off()
 ```
