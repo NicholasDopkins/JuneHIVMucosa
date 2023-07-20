@@ -246,7 +246,7 @@ dev.off()
 #familyPCT
 pdf("TE_family_pct.pdf", width=4.5, height=4)
 
-ggplot(herv_Family, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Family, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Family")) + scale_fill_manual(values = mycolors)  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(herv_Family, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Family, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Family")) + scale_fill_manual(values = mycolors_TE_Family)  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
@@ -325,14 +325,14 @@ TE_Family_int <- abundance_sum_int(count_mat = raw_herv_interferome,meta = meta_
 #group
 pdf("group_count_int.pdf", width=4, height=4)
 
-ggplot(herv_Category_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = AvgCount, fill = reorder(Category, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "HERV Category")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(herv_Category_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = AvgCount, fill = reorder(Category, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Average Count Per Sample") + scale_fill_brewer(palette="Paired")   + guides(fill = guide_legend(title = "HERV Category")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
 
 #class
 pdf("group_class_int.pdf", width=4, height=4)
-ggplot(herv_Class_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5","a8", "a14", "b")), y = AvgCount, fill = reorder(Class, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "HERV Class")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(herv_Class_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5","a8", "a14", "b")), y = AvgCount, fill = reorder(Class, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Average Count Per Sample") + scale_fill_brewer(palette="Paired")   + guides(fill = guide_legend(title = "HERV Class")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
@@ -340,14 +340,14 @@ dev.off()
 #chrom
 pdf("group_chrom_int.pdf", width=5, height=4)
 
-ggplot(herv_Chrom_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = AvgCount, fill = reorder(Chrom, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "Chrom")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(herv_Chrom_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = AvgCount, fill = reorder(Chrom, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Average Count Per Sample") + scale_fill_manual(values = mycolors_TE_Chromosomes)  + guides(fill = guide_legend(title = "Chrom")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
 
 #TE_type
 pdf("TE_type_int.pdf", width=4, height=4)
-ggplot(TE_type_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = AvgCount, fill = reorder(TE_type, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE_type")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(TE_type_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = AvgCount, fill = reorder(TE_type, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Average Count Per Sample") + scale_fill_brewer(palette="Paired")   + guides(fill = guide_legend(title = "TE_type")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
@@ -355,7 +355,7 @@ dev.off()
 #family
 pdf("TE_Family_int.pdf", width=5, height=4)
 
-ggplot(TE_Family_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = AvgCount, fill = reorder(Family, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Family")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(TE_Family_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = AvgCount, fill = reorder(Family, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Family"))+ scale_fill_manual(values = mycolors_TE_Family)   + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
@@ -363,28 +363,28 @@ dev.off()
 #groupPCT
 pdf("group_count_int_pct.pdf", width=4, height=4)
 
-ggplot(herv_Category_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = PCT, fill = reorder(Category, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "HERV Category")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(herv_Category_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = PCT, fill = reorder(Category, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Percent Abundance") + scale_fill_brewer(palette="Paired")   + guides(fill = guide_legend(title = "HERV Category")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
 
 #classPCT
 pdf("group_class_int_pct.pdf", width=4, height=4)
-ggplot(herv_Class_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = PCT, fill = reorder(Class, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "HERV Class")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(herv_Class_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = PCT, fill = reorder(Class, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Percent Abundance") + scale_fill_brewer(palette="Paired")   + guides(fill = guide_legend(title = "HERV Class")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
 
 #chromPCT
 pdf("group_chrom_int_pct.pdf", width=5, height=4)
-ggplot(herv_Chrom_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = PCT, fill = reorder(Chrom, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "Chrom")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(herv_Chrom_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = PCT, fill = reorder(Chrom, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Percent Abundance") + scale_fill_manual(values = mycolors_TE_Chromosomes)  + guides(fill = guide_legend(title = "Chrom")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
 
 #TE_typePCT
 pdf("TE_type_int_pct.pdf", width=4, height=4)
-ggplot(TE_type_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = PCT, fill = reorder(TE_type, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE_type")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(TE_type_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = PCT, fill = reorder(TE_type, -PCT))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Percent Abundance") + scale_fill_brewer(palette="Paired")   + guides(fill = guide_legend(title = "TE_type")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
@@ -392,7 +392,7 @@ dev.off()
 #family
 pdf("TE_Family_int_pct.pdf", width=5, height=4)
 
-ggplot(TE_Family_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = PCT, fill = reorder(Family, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Family")) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+ggplot(TE_Family_int, aes(x = factor(Library.Name, levels = c("m", "a1", "a2", "a5", "a8", "a14", "b")), y = PCT, fill = reorder(Family, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("Interferon Type")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Family"))+ scale_fill_manual(values = mycolors_TE_Family)   + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
 
 dev.off()
