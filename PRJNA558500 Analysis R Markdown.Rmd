@@ -61,9 +61,15 @@ raw_herv <- raw_herv[!(row.names(raw_herv) %in% "__no_feature"),]
 
 ```{r}
 ddsf <- read.csv(file = "PRJNA558500MetaData.csv")
+ddsf2 <- read.csv(file = "Meta2.csv")
+rownames(ddsf) <- ddsf$Sample.Name
+rownames(ddsf2) <- ddsf2$ï..MIHIVode
+combined_ddsf <- cbind(ddsf2, ddsf[rownames(ddsf2),])
+ddsf <- combined_ddsf
+rownames(ddsf) <- ddsf$ï..Run
 ddsf[which(ddsf$disease == ""),"disease"] <- "HIVneg"
 ddsf[which(ddsf$disease == "HIV-1"),"disease"] <- "HIVpos"
-dds <- DESeqDataSetFromMatrix(countData = raw_herv, colData = ddsf, design = ~ disease)
+dds <- DESeqDataSetFromMatrix(countData = raw_herv, colData = ddsf[colnames(raw_herv),], design = ~ disease)
 dds$disease <- relevel(dds$disease, ref = "HIVneg")
 dds <- DESeq(dds)
 resultsNames(dds)
@@ -105,7 +111,7 @@ screeplot(p, axisLabSize = 10, titleLabSize = 22)
 dev.off()
 
 pdf("biplot.pdf")
-biplot(p, lab = p$disease, labSize = 2, pointSize = 2, colby = 'disease', legendTitleSize = 0, showLoadingsNames = TRUE, legendPosition = 'right', encircle = TRUE, xlim = c(-50,50), ylim = c(-60,60), title = 'HIVneg vs HIVpos Gut Biopsies') 
+biplot(p, lab = p$disease, labSize = 2, pointSize = 2, colby = 'disease', shape = 'Sex', legendTitleSize = 0, showLoadingsNames = TRUE, legendPosition = 'right', encircle = TRUE, xlim = c(-50,50), ylim = c(-60,60), title = 'HIVneg vs HIVpos Gut Biopsies') 
 
 dev.off()
 ```
@@ -114,8 +120,7 @@ dev.off()
 ```{r}
 #count_mat: the count matrix; meta = metadata; annotation = TE or gene annotation, the summary category table to build stack plot from; category = the category from annotation table to summarize from; cont = the contrast group from matadata
 annotation <- read.delim("TE_annotation.v2.0.tsv", row.names = 1)
-meta <- metadata.csv
-rownames(meta) <- meta$`ï..Run`
+meta <- ddsf
 meta[which(meta$disease == ""),"disease"] <- "HIVneg"
 meta[which(meta$disease == "HIV-1"),"disease"] <- "HIVpos"
   
@@ -1058,4 +1063,38 @@ plot_contrast(dtMat, metadata = meta, category = "disease", herv = "HERV4_4q22.1
 dev.off()
 
 ```
+
+
+```{r}
+meta$CD4a <- as.numeric(meta$CD4a)
+herv_to_quantify <- rownames(ddsSig)
+herv_table_cd4a <- data.frame(matrix(ncol = length(herv_to_quantify)+2, nrow = nrow(meta)))
+colnames(herv_table_cd4a) <- c("Run","CD4a",herv_to_quantify)
+rownames(herv_table_cd4a) <- rownames(meta)
+for(herv in herv_to_quantify){
+  for(item in unique(meta$ï..Run)){
+    count_total <- sum(dtMat[herv,item])
+    cd4a <- meta[item,"CD4a"]
+    herv_table_cd4a[item,c("Run","CD4a",herv)] <- c(item,cd4a,count_total)
+  }
+}
+herv_table_cd4a$CD4a <- as.numeric(herv_table_cd4a$CD4a)
+herv_table_cd4a$disease <- meta[rownames(herv_table_cd4a),"disease"]
+herv_table_cd4a$cd4 <- meta[rownames(herv_table_cd4a),"CD4"]
+herv_table_cd4a$viral_load <- meta[rownames(herv_table_cd4a),"Viral_Load"]
+herv_table_cd4a$viral_load[is.na(herv_table_cd4a$viral_load)] <- 0
+herv_table_cd4a$L1FLnI_2q22.2k <- as.numeric(herv_table_cd4a$L1FLnI_2q22.2k)
+herv_table_cd4a$HERV4_4q22.1 <- as.numeric(herv_table_cd4a$HERV4_4q22.1)
+
+# "L1FLnI_4q35.2i"    "L1FLnI_4p16.3c"    "L1FLnI_1p13.1e"    "L1FLnI_1p34.2a"    "L1FLnI_1p22.2l"    "MER4_7q21.2"      "LTR19_12p13.31"    "MER4B_19q13.42a"   "MER101_2p25.2"     "L1FLnI_17q12k"     "L1FLnI_1q23.1t"    "HERVH_6q23.1"     "L1FLnI_1q23.1u"    "HERVIP10F_12p13.2" "HARLEQUIN_10q24.2" "HERVH48_2q22.2"    "HERVH_4p15.33d"    "HARLEQUIN_17q12"  "L1FLnI_4p15.32e"   "L1FLnI_3p24.1m"    "MER61_1q23.1c"     "L1FLnI_Xq21.1hb"   "L1FLnI_2q22.2k"    "L1FLnI_12p13.31k" "HERVEA_5q22.2"     "HERVH_7q11.21"     "L1FLnI_12p12.1r"   "L1FLnI_1q23.2i"    "L1FLnI_7p13a"      "ERVLB4_17q25.3b"  "L1FLnI_16q12.1b"   "MER34B_4q31.3"     "HERV4_4q22.1"      "HERVH_2q24.1e"     "HARLEQUIN_10q23.1" "MER41_16q21"      "L1FLnI_1q23.1s"    "HERV3_7q33"        "L1FLnI_18q12.3x"   "L1FLnI_11q13.4d"   "L1FLnI_2q33.1g"    "HARLEQUIN_7q33a"  "L1FLnI_1q23.3b"    "L1FLnI_Xq21.1db"   "L1FLnI_9p21.1ha"   "L1FLnI_5q32n"      "L1FLnI_5q32o"      "L1FLnI_8q21.3da"  "L1FLnI_7q31.1ta"   "L1FLnI_3q26.31h"   "L1FLnI_1p31.1nc"   "L1FLnI_4p13m"      "L1FLnI_6q22.31z"   "L1FLnI_7q21.13c"  "L1FLnI_11p14.1v"   "L1FLnI_4q21.21x"   "L1FLnI_5q21.3q"    "L1FLnI_1p31.1l"    "L1FLnI_2q32.1k"
+
+ggplot(herv_table_cd4a, aes(x=CD4a, y = HERV4_4q22.1, col = disease )) + geom_point()
+
+ggplot(herv_table_cd4a, aes(x=viral_load, y = HERV4_4q22.1, col = disease )) + geom_point()
+
+```
+
+
+
+
 
