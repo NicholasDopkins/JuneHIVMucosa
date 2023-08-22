@@ -853,11 +853,11 @@ plot_contrast <- function(count_table, metadata,category, herv, title = "Selecte
   colnames(count_hervs) <- c("HERV","Category")
   if(group == "2-side"){
   herv_plot <- ggplot(count_hervs, aes(x = Category, y = HERV, color = Category)) + geom_boxplot(outlier.shape = NA)+ geom_jitter(size = 1, shape=16, position=position_jitter(0.2))+ stat_summary(fun.y=mean)+xlab(NULL)+ ylab(" Normalized Counts")+ggtitle(title)+theme(plot.title = element_text(size = 15, face = "bold"),axis.title=element_text(size=15,face="bold"),legend.title = element_text(size = 15,face="bold"),axis.text = element_text(size = 15),axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))+ theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + stat_compare_means(method = "t.test")}
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + stat_compare_means(method = "t.test", label.x.npc = "center", label.y.npc = "top", size = 2.5)}
   else{
     herv_plot <- ggplot(count_hervs, aes(x = Category, y = HERV, color = Category)) + geom_boxplot(outlier.shape = NA)+ geom_jitter(size = 1, shape=16, position=position_jitter(0.2))+ stat_summary(fun.y=mean)+xlab(NULL)+ ylab(" Normalized Counts")+ggtitle(title)+theme(plot.title = element_text(size = 15, face = "bold"),axis.title=element_text(size=15,face="bold"),legend.title = element_text(size = 15,face="bold"),axis.text = element_text(size = 15),axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))+ theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))+ stat_compare_means(method = "anova",label.x = 2.5, label.y =20)+ stat_compare_means(label = "p.signif", method = "t.test",
-                     ref.group = "m")
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))+ stat_compare_means(method = "anova",label.y.npc = "top", label.x.npc = "center", size = 2.5)+ stat_compare_means(label = "p.signif", method = "t.test",
+                     ref.group = "m", label.y.npc = "bottom", hide.ns = TRUE, size = 3)
   }
   return(print(herv_plot))}
 
@@ -1023,6 +1023,7 @@ plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv 
 
 dev.off()
 
+
 #Gut
 ### "MER101_2p25.2" "L1FLnI_1p22.2l" "HARLEQUIN_17q12" "MER4_7q21.2" "L1FLnI_17q12k" "L1FLnI_9p21.1ha" "HERV4_4q22.1" 
 pdf("Gut_MER101_2p25.2.pdf", height = 6, width = 4)
@@ -1066,25 +1067,6 @@ pdf("Gut_HERV4_4q22.1.pdf", height = 6, width = 4)
 plot_contrast(dtMat, metadata = meta, category = "disease", herv = "HERV4_4q22.1", title = "HERV4_4q22.1")
 
 dev.off()
-
-#LTR19_12p13.31
-pdf("Gut_LTR19_12p13.31.pdf", height = 6, width = 4)
-
-plot_contrast(dtMat, metadata = meta, category = "disease", herv = "LTR19_12p13.31", title = "LTR19_12p13.31")
-
-dev.off()
-
-pdf("LTR19_12p13.31.pdf", height = 6, width = 5)
-
-plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "LTR19_12p13.31", title = "LTR19_12p13.31")
-
-dev.off()
-
-
-
-
-
-
 ```
 
 ##Interest from clinical parameters 
