@@ -413,8 +413,7 @@ dds_Interferome <- DESeqDataSetFromMatrix(countData = raw_herv_interferome[, row
 #dds_Interferome$Library.Name <- relevel(dds_Interferome$Library.Name, ref = "m")
 dds_Interferome <- DESeq(dds_Interferome, parallel = T, betaPrior = T)
 resultsNames(dds_Interferome)
-
-##disease_"Library.Name_a1_vs_m"  "Library.Name_a14_vs_m" "Library.Name_a2_vs_m"  "Library.Name_a5_vs_m" "Library.Name_a8_vs_m"  "Library.Name_b_vs_m" 
+ 
 ```
 
 ##Make Volcano Plot Library.Name_a1_vs_m
@@ -438,10 +437,6 @@ pdf("Library.Name_a1_vs_m.pdf")
 EnhancedVolcano::EnhancedVolcano(resultsdds_Interferome_Library.Name_a1_vs_m, lab = rownames(resultsdds_Interferome_Library.Name_a1_vs_m), x = 'log2FoldChange', y = 'padj', title = 'Mock vs IFNa1', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', colCustom = keyvals.coloura1)
 
 dev.off()
-
-
-
-
 ```
 
 ##Make Volcano Plot Library.Name_a14_vs_m
@@ -1966,4 +1961,311 @@ plot_contrast(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv 
 
 dev.off()
 ```
+
+##PBMC Data
+```{r}
+##Set to personal directory
+setwd("D:\\Nixon Lab/HERV Gut - interferome Mario Paper/RDirectory/HIV_HERV/")
+###########Scopetools##################################
+####Create a list of sample names
+
+sam_names_dir_PBMC <- gsub(paste("pbmc/telescope/","\\/",sep = ""),"",list.dirs("pbmc/telescope/"))[-1]
+
+####load_telescope_reports - files: give a list of paths that contain the telescope reports, colnames: column names 
+raw_herv_PBMC <- load_telescope_reports(files = paste("pbmc/telescope/",sam_names_dir_PBMC,"/",sam_names_dir_PBMC,".tsv", sep = ""), colnames = sam_names_dir_PBMC)
+
+
+##filter lowly abundant retrotransposons
+cutoff.count <- 2
+cutoff.sample <- floor(ncol(raw_herv_PBMC) * 0.1)
+raw_herv_PBMC <- raw_herv_PBMC[rowSums(raw_herv_PBMC > cutoff.count) > cutoff.sample, ]
+raw_herv_PBMC <- raw_herv_PBMC[!(row.names(raw_herv_PBMC) %in% "__no_feature"),]
+```
+
+#DESEQ PBMCs
+```{r}
+ddsfPBMCFormat <- ddsf
+rownames(ddsfPBMCFormat) <- ddsfPBMCFormat$MIHIVode
+ddsPBMC <- DESeqDataSetFromMatrix(countData = raw_herv_PBMC, colData = ddsfPBMCFormat[colnames(raw_herv_PBMC),], design = ~ disease)
+ddsPBMC$disease <- relevel(ddsPBMC$disease, ref = "HIVneg")
+ddsPBMC <- DESeq(ddsPBMC)
+resultsNames(ddsPBMC)
+resultsddsPBMC <- results(ddsPBMC, name = "disease_HIVpos_vs_HIVneg")
+```
+
+##Make Volcano Plot PBMCs
+```{r}
+pdf("HIV+ vs HIV- PBMCs.pdf")
+
+keyvals.colourPBMC <- ifelse(
+    resultsddsPBMC$padj > 0.05, 'black',
+      ifelse(resultsddsPBMC$log2FoldChange > 1, '#063970',ifelse(
+             resultsddsPBMC$log2FoldChange < -1, '#Ff6300',
+        'black')))
+  keyvals.colourPBMC[is.na(keyvals.colourPBMC)] <- 'black'
+  names(keyvals.colourPBMC)[keyvals.colourPBMC == '#063970'] <- 'Upregulated'
+  names(keyvals.colourPBMC)[keyvals.colourPBMC == 'black'] <- 'Unchanged'
+  names(keyvals.colourPBMC)[keyvals.colourPBMC == '#Ff6300'] <- 'Downregulated'
+
+EnhancedVolcano::EnhancedVolcano(resultsddsPBMC, lab = rownames(resultsddsPBMC), x = 'log2FoldChange', y = 'padj', title = 'HIVneg vs HIVpos PBMCs', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', colCustom = keyvals.colourPBMC)
+
+dev.off()
+```
+
+##Make PCA PBMCs
+
+```{r}
+vstPBMC <- assay(vst(ddsPBMC))
+pPBMC <- pca(vstPBMC, metadata = colData(ddsPBMC), removeVar = 0.1)
+
+pdf("SCREE plot PBMC.pdf")
+screeplot(pPBMC, axisLabSize = 10, titleLabSize = 22)
+
+dev.off()
+
+pdf("biplot PBMC.pdf")
+biplot(pPBMC, lab = pPBMC$disease, labSize = 2, pointSize = 2, colby = 'disease', shape = 'Sex', legendTitleSize = 0, showLoadingsNames = TRUE, legendPosition = 'right', encircle = TRUE, xlim = c(-50,50), ylim = c(-60,60), title = 'HIVneg vs HIVpos PBMC') 
+
+dev.off()
+```
+
+
+##PLot_contrast +T Test
+```{r}
+plot_contrast_STAT <- function(count_table, metadata,category, herv, title = "Selected Counts", group = "2-side"){
+  count_hervs <- cbind(t(count_table[herv,rownames(metadata), drop = FALSE]), metadata[, category,drop = FALSE])
+  colnames(count_hervs) <- c("HERV","Category")
+  if(group == "2-side"){
+  herv_plot <- ggplot(count_hervs, aes(x = Category, y = HERV, color = Category)) +stat_compare_means(method = "t.test") + geom_boxplot(outlier.shape = NA)+ geom_jitter(size = 1, shape=16, position=position_jitter(0.2))+ stat_summary(fun.y=mean)+xlab(NULL)+ ylab(" Normalized Counts")+ggtitle(title)+theme(plot.title = element_text(size = 15, face = "bold"),axis.title=element_text(size=15,face="bold"),legend.title = element_text(size = 15,face="bold"),axis.text = element_text(size = 15),axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))+ theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))}
+  else{
+    herv_plot <- ggplot(count_hervs, aes(x = Category, y = HERV, color = Category)) + geom_boxplot(outlier.shape = NA)+ geom_jitter(size = 1, shape=16, position=position_jitter(0.2))+ stat_summary(fun.y=mean)+xlab(NULL)+ ylab(" Normalized Counts")+ggtitle(title)+theme(plot.title = element_text(size = 15, face = "bold"),axis.title=element_text(size=15,face="bold"),legend.title = element_text(size = 15,face="bold"),axis.text = element_text(size = 15),axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))+ theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+  }
+  return(print(herv_plot))}
+```
+
+
+```{r}
+dtMat_PBMC <- counts(ddsPBMC, normalized = TRUE)
+### L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s 
+
+pdf("PBMC_L1FLnI_5q32o.pdf", height = 6, width = 4)
+
+plot_contrast_STAT(dtMat_PBMC, metadata = ddsfPBMCFormat, category = "disease", herv = "L1FLnI_5q32o", title = "L1FLnI_5q32o")
+
+dev.off()
+
+pdf("PBMC_LTR19_12p13.31.pdf", height = 6, width = 4)
+
+plot_contrast_STAT(dtMat_PBMC, metadata = ddsfPBMCFormat, category = "disease", herv = "LTR19_12p13.31", title = "LTR19_12p13.31")
+
+dev.off()
+
+pdf("PBMC_L1FLnI_1q23.1s.pdf", height = 6, width = 4)
+
+plot_contrast_STAT(dtMat_PBMC, metadata = ddsfPBMCFormat, category = "disease", herv = "L1FLnI_1q23.1s", title = "L1FLnI_1q23.1s")
+
+dev.off()
+
+
+pdf("Gut_L1FLnI_5q32o.pdf", height = 6, width = 4)
+
+plot_contrast_STAT(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_5q32o", title = "L1FLnI_5q32o")
+
+dev.off()
+
+pdf("Gut_LTR19_12p13.31.pdf", height = 6, width = 4)
+
+plot_contrast_STAT(dtMat, metadata = meta, category = "disease", herv = "LTR19_12p13.31", title = "LTR19_12p13.31")
+
+dev.off()
+
+pdf("Gut_L1FLnI_1q23.1s.pdf", height = 6, width = 4)
+
+plot_contrast_STAT(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_1q23.1s", title = "L1FLnI_1q23.1s")
+
+dev.off()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##VDZ data
+
+```{r}
+####Create a list of sample names
+sam_names_dir_VDZ <- gsub(paste("HOPE_HIV/telescope/","\\/",sep = ""),"",list.dirs("HOPE_HIV/telescope/"))[-1]
+
+####load_telescope_reports - files: give a list of paths that contain the telescope reports, colnames: column names 
+raw_herv_VDZ <- load_telescope_reports(files = paste("HOPE_HIV/telescope/", sam_names_dir_VDZ,"/",sam_names_dir_VDZ,".tsv", sep = ""), colnames = sam_names_dir_VDZ)
+
+##filter lowly abundant retrotransposons
+cutoff.count <- 1
+cutoff.sample <- floor(ncol(raw_herv_VDZ) * 0.05)
+raw_herv_VDZ <- raw_herv_VDZ[rowSums(raw_herv_VDZ > cutoff.count) > cutoff.sample, ]
+raw_herv_VDZ <- raw_herv_VDZ[!(row.names(raw_herv_VDZ) %in% "__no_feature"),]
+```
+
+
+##DESEQ2 VDZ
+
+```{r}
+ddsf_VDZ <- read.csv(file = "HOPEmeta.csv")
+rownames(ddsf_VDZ) <- ddsf_VDZ$ï..Sample
+dds_VDZ <- DESeqDataSetFromMatrix(countData = raw_herv_VDZ[, rownames(ddsf_VDZ)], colData = ddsf_VDZ, design = ~ Condition)
+dds_VDZ <- DESeq(dds_VDZ, parallel = T, betaPrior = T)
+resultsNames(dds_VDZ)
+
+##"ConditionLC_POST" "ConditionLC_PRE"  "ConditionTI_POST" "ConditionTI_PRE" 
+```
+
+##Make Volcano Plot Library.Name_LC_PRE vs LC_POST
+
+```{r}
+#Null , xlim = c(, ), ylim = c(,) can be added for preference
+
+resultsdds_VDZ_Condition_LC_POST_vs_LC_PRE <- results(dds_VDZ, contrast=c("Condition", "LC_POST", "LC_PRE"))
+
+keyvals.coloura1 <- ifelse(
+    resultsdds_VDZ_Condition_LC_POST_vs_LC_PRE$padj > 0.05, 'black',
+      ifelse(resultsdds_VDZ_Condition_LC_POST_vs_LC_PRE$log2FoldChange > 1, '#063970',ifelse(
+             resultsdds_VDZ_Condition_LC_POST_vs_LC_PRE$log2FoldChange < -1, '#Ff6300',
+        'black')))
+  keyvals.coloura1[is.na(keyvals.coloura1)] <- 'black'
+  names(keyvals.coloura1)[keyvals.coloura1 == '#063970'] <- 'Upregulated'
+  names(keyvals.coloura1)[keyvals.coloura1 == 'black'] <- 'Unregulated'
+  names(keyvals.coloura1)[keyvals.coloura1 == '#Ff6300'] <- 'Downregulated'
+  
+pdf("Condition LC Pre vs Post.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_VDZ_Condition_LC_POST_vs_LC_PRE, lab = rownames(resultsdds_VDZ_Condition_LC_POST_vs_LC_PRE), x = 'log2FoldChange', y = 'padj', title = 'Left Colon VDZ Treatment', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', colCustom = keyvals.coloura1)
+
+dev.off()
+```
+
+##Make Volcano Plot Library.Name_TI_PRE vs TI_POST
+
+```{r}
+#Null , xlim = c(, ), ylim = c(,) can be added for preference
+
+resultsdds_VDZ_Condition_TI_POST_vs_TI_PRE <- results(dds_VDZ, contrast=c("Condition", "TI_POST", "TI_PRE"))
+
+keyvals.coloura1 <- ifelse(
+    resultsdds_VDZ_Condition_TI_POST_vs_TI_PRE$padj > 0.05, 'black',
+      ifelse(resultsdds_VDZ_Condition_TI_POST_vs_TI_PRE$log2FoldChange > 1, '#063970',ifelse(
+             resultsdds_VDZ_Condition_TI_POST_vs_TI_PRE$log2FoldChange < -1, '#Ff6300',
+        'black')))
+  keyvals.coloura1[is.na(keyvals.coloura1)] <- 'black'
+  names(keyvals.coloura1)[keyvals.coloura1 == '#063970'] <- 'Upregulated'
+  names(keyvals.coloura1)[keyvals.coloura1 == 'black'] <- 'Unregulated'
+  names(keyvals.coloura1)[keyvals.coloura1 == '#Ff6300'] <- 'Downregulated'
+  
+pdf("Condition TI Pre vs Post.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_VDZ_Condition_TI_POST_vs_TI_PRE, lab = rownames(resultsdds_VDZ_Condition_TI_POST_vs_TI_PRE), x = 'log2FoldChange', y = 'padj', title = 'Terminal Ileum VDZ Treatment', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', colCustom = keyvals.coloura1)
+
+dev.off()
+```
+
+##Make Volcano Plot Library.Name_TI_PRE vs LC_POST
+
+```{r}
+#Null , xlim = c(, ), ylim = c(,) can be added for preference
+
+resultsdds_VDZ_Condition_TI_PREvs_LC_PRE <- results(dds_VDZ, contrast=c("Condition", "TI_PRE", "LC_PRE"))
+
+keyvals.coloura1 <- ifelse(
+    resultsdds_VDZ_Condition_TI_PREvs_LC_PRE$padj > 0.05, 'black',
+      ifelse(resultsdds_VDZ_Condition_TI_PREvs_LC_PRE$log2FoldChange > 1, '#063970',ifelse(
+             resultsdds_VDZ_Condition_TI_PREvs_LC_PRE$log2FoldChange < -1, '#Ff6300',
+        'black')))
+  keyvals.coloura1[is.na(keyvals.coloura1)] <- 'black'
+  names(keyvals.coloura1)[keyvals.coloura1 == '#063970'] <- 'Upregulated'
+  names(keyvals.coloura1)[keyvals.coloura1 == 'black'] <- 'Unregulated'
+  names(keyvals.coloura1)[keyvals.coloura1 == '#Ff6300'] <- 'Downregulated'
+  
+pdf("Pretreatment TI vs LC.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_VDZ_Condition_TI_PREvs_LC_PRE, lab = rownames(resultsdds_VDZ_Condition_TI_PREvs_LC_PRE), x = 'log2FoldChange', y = 'padj', title = 'Pre treatment LC vs TI', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', colCustom = keyvals.coloura1)
+
+dev.off()
+```
+
+
+##Make Volcano Plot Library.Name_TI_POST vs LC_POST
+
+```{r}
+#Null , xlim = c(, ), ylim = c(,) can be added for preference
+
+resultsdds_VDZ_Condition_TI_POSTvs_LC_POST <- results(dds_VDZ, contrast=c("Condition", "TI_POST", "LC_POST"))
+
+keyvals.coloura1 <- ifelse(
+    resultsdds_VDZ_Condition_TI_POSTvs_LC_POST$padj > 0.05, 'black',
+      ifelse(resultsdds_VDZ_Condition_TI_POSTvs_LC_POST$log2FoldChange > 1, '#063970',ifelse(
+             resultsdds_VDZ_Condition_TI_POSTvs_LC_POST$log2FoldChange < -1, '#Ff6300',
+        'black')))
+  keyvals.coloura1[is.na(keyvals.coloura1)] <- 'black'
+  names(keyvals.coloura1)[keyvals.coloura1 == '#063970'] <- 'Upregulated'
+  names(keyvals.coloura1)[keyvals.coloura1 == 'black'] <- 'Unregulated'
+  names(keyvals.coloura1)[keyvals.coloura1 == '#Ff6300'] <- 'Downregulated'
+  
+pdf("Post treatment TI vs LC.pdf")
+EnhancedVolcano::EnhancedVolcano(resultsdds_VDZ_Condition_TI_POSTvs_LC_POST, lab = rownames(resultsdds_VDZ_Condition_TI_POSTvs_LC_POST), x = 'log2FoldChange', y = 'padj', title = 'Posttreatment LC vs TI', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', colCustom = keyvals.coloura1)
+
+dev.off()
+```
+
+
+
+```{r}
+#Gut Sample Matrix
+dtMat_VDZ <- counts(dds_VDZ, normalized = TRUE)
+### L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s 
+
+pdf("VDZ_L1FLnI_5q32o.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat_VDZ, metadata = ddsf_VDZ, category = "Condition", herv = "L1FLnI_5q32o", title = "L1FLnI_5q32o")
+
+dev.off()
+
+pdf("VDZ_LTR19_12p13.31.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat_VDZ, metadata = ddsf_VDZ, category = "Condition", herv = "LTR19_12p13.31", title = "LTR19_12p13.31")
+
+dev.off()
+
+pdf("VDZ_L1FLnI_1q23.1s.pdf", height = 6, width = 4)
+
+plot_contrast(dtMat_VDZ, metadata = ddsf_VDZ, category = "Condition", herv = "L1FLnI_1q23.1s", title = "L1FLnI_1q23.1s")
+
+dev.off()
+```
+
+
+```{r}
+vstVDZ <- assay(vst(dds_VDZ))
+pVDZ <- pca(vstVDZ, metadata = colData(dds_VDZ), removeVar = 0.1)
+
+pdf("SCREE plot VDZ.pdf")
+screeplot(pVDZ, axisLabSize = 10, titleLabSize = 22)
+
+dev.off()
+
+pdf("biplot_VDZ.pdf")
+biplot(pVDZ, lab = pVDZ$Condition, labSize = 2, pointSize = 2, colby = 'Condition', shape = 'Individual', legendTitleSize = 0, showLoadingsNames = TRUE, legendPosition = 'right', encircle = TRUE, xlim = c(-50,50), ylim = c(-60,60), title = 'VDZ Treatment') 
+
+dev.off()
+```
+
 
