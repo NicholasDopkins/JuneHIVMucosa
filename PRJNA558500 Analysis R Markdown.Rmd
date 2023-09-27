@@ -2028,6 +2028,39 @@ biplot(pPBMC, lab = pPBMC$disease, labSize = 2, pointSize = 2, colby = 'disease'
 
 dev.off()
 ```
+##PBMC Heatmaps
+```{r}
+ddsSigPBMC <- subset(resultsddsPBMC, padj < 0.05)
+ddsSigPBMC <- subset(ddsSigPBMC, log2FoldChange >= 1 | log2FoldChange <= -1)
+ddsSigPBMC <- as.data.frame(ddsSigPBMC)
+#Sort in descending order
+ddsSigPBMC <- ddsSigPBMC[order(ddsSigPBMC$log2FoldChange, decreasing=TRUE),]
+
+sort
+
+dfPBMC <- vst(ddsPBMC, blind = TRUE)
+dfPBMCAll <- dfPBMC %>% assay(.)
+dfPBMC <- dfPBMC[rownames(ddsSigPBMC),] %>% assay(.)
+
+#Set color scale to match rest of data (HIVpos=blue, HIVneg=red)
+annot_colors=list(disease=c(HIVneg="#F0978D",HIVpos="#63D7DE"))
+
+pdf("Heatmap PBMC sig.pdf", height = 6, width = 4)
+dfPBMC <- dfPBMC[, rownames(ddsfPBMCFormat)[order(ddsfPBMCFormat$disease)]]
+pheatmap(dfPBMC, annotation_colors=annot_colors, scale="row",main = "HIVneg vs HIVpos PBMC",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = ddsfPBMCFormat[,"disease",drop = FALSE], color = hcl.colors(10000, "RdYlBu"))
+
+dev.off()
+
+pdf("Heatmap PBMC all.pdf", height = 6, width = 4)
+dfPBMCAll_clust <- dfPBMCAll[, rownames(ddsfPBMCFormat)[order(ddsfPBMCFormat$disease)]]
+pheatmap(dfPBMCAll_clust, annotation_colors=annot_colors, scale="row",main = "HIVneg vs HIVpos PBMC",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = ddsfPBMCFormat[,"disease",drop = FALSE], color = hcl.colors(10000, "RdYlBu"))
+
+dev.off()
+```
+
+
+
+
 
 
 ##PLot_contrast +T Test
@@ -2036,7 +2069,7 @@ plot_contrast_STAT <- function(count_table, metadata,category, herv, title = "Se
   count_hervs <- cbind(t(count_table[herv,rownames(metadata), drop = FALSE]), metadata[, category,drop = FALSE])
   colnames(count_hervs) <- c("HERV","Category")
   if(group == "2-side"){
-  herv_plot <- ggplot(count_hervs, aes(x = Category, y = HERV, color = Category)) +stat_compare_means(method = "t.test") + geom_boxplot(outlier.shape = NA)+ geom_jitter(size = 1, shape=16, position=position_jitter(0.2))+ stat_summary(fun.y=mean)+xlab(NULL)+ ylab(" Normalized Counts")+ggtitle(title)+theme(plot.title = element_text(size = 15, face = "bold"),axis.title=element_text(size=15,face="bold"),legend.title = element_text(size = 15,face="bold"),axis.text = element_text(size = 15),axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))+ theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+  herv_plot <- ggplot(count_hervs, aes(x = Category, y = HERV, color = Category)) +stat_compare_means(method = "t.test", label = "p.signif", label.x.npc = "middle") + geom_boxplot(outlier.shape = NA)+ geom_jitter(size = 1, shape=16, position=position_jitter(0.2))+ stat_summary(fun.y=mean)+xlab(NULL)+ ylab(" Normalized Counts")+ggtitle(title)+theme(plot.title = element_text(size = 15, face = "bold"),axis.title=element_text(size=15,face="bold"),legend.title = element_text(size = 15,face="bold"),axis.text = element_text(size = 15),axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))+ theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))}
   else{
     herv_plot <- ggplot(count_hervs, aes(x = Category, y = HERV, color = Category)) + geom_boxplot(outlier.shape = NA)+ geom_jitter(size = 1, shape=16, position=position_jitter(0.2))+ stat_summary(fun.y=mean)+xlab(NULL)+ ylab(" Normalized Counts")+ggtitle(title)+theme(plot.title = element_text(size = 15, face = "bold"),axis.title=element_text(size=15,face="bold"),legend.title = element_text(size = 15,face="bold"),axis.text = element_text(size = 15),axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))+ theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
@@ -2045,49 +2078,88 @@ panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
   return(print(herv_plot))}
 ```
 
-
+##Expression of EREs of interest in gut and blood with T Test
 ```{r}
 dtMat_PBMC <- counts(ddsPBMC, normalized = TRUE)
 ### L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s 
 
-pdf("PBMC_L1FLnI_5q32o.pdf", height = 6, width = 4)
+pdf("PBMC_L1FLnI_5q32o.pdf", height = 6, width = 3)
 
 plot_contrast_STAT(dtMat_PBMC, metadata = ddsfPBMCFormat, category = "disease", herv = "L1FLnI_5q32o", title = "L1FLnI_5q32o")
 
 dev.off()
 
-pdf("PBMC_LTR19_12p13.31.pdf", height = 6, width = 4)
+pdf("PBMC_LTR19_12p13.31.pdf", height = 6, width = 3)
 
 plot_contrast_STAT(dtMat_PBMC, metadata = ddsfPBMCFormat, category = "disease", herv = "LTR19_12p13.31", title = "LTR19_12p13.31")
 
 dev.off()
 
-pdf("PBMC_L1FLnI_1q23.1s.pdf", height = 6, width = 4)
+pdf("PBMC_L1FLnI_1q23.1s.pdf", height = 6, width = 3)
 
 plot_contrast_STAT(dtMat_PBMC, metadata = ddsfPBMCFormat, category = "disease", herv = "L1FLnI_1q23.1s", title = "L1FLnI_1q23.1s")
 
 dev.off()
 
 
-pdf("Gut_L1FLnI_5q32o.pdf", height = 6, width = 4)
+pdf("Gut_L1FLnI_5q32o.pdf", height = 6, width = 3)
 
 plot_contrast_STAT(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_5q32o", title = "L1FLnI_5q32o")
 
 dev.off()
 
-pdf("Gut_LTR19_12p13.31.pdf", height = 6, width = 4)
+pdf("Gut_LTR19_12p13.31.pdf", height = 6, width = 3)
 
 plot_contrast_STAT(dtMat, metadata = meta, category = "disease", herv = "LTR19_12p13.31", title = "LTR19_12p13.31")
 
 dev.off()
 
-pdf("Gut_L1FLnI_1q23.1s.pdf", height = 6, width = 4)
+pdf("Gut_L1FLnI_1q23.1s.pdf", height = 6, width = 3)
 
 plot_contrast_STAT(dtMat, metadata = meta, category = "disease", herv = "L1FLnI_1q23.1s", title = "L1FLnI_1q23.1s")
 
 dev.off()
 ```
 
+##PLot_contrast Anova + post hoc T Test
+```{r}
+my_comparisons <- list(c("m", "a1"), c("m", "a2"), c("m", "a5"), c("m", "a8"), c("m", "a14"), c("m", "b"))
+ 
+
+plot_contrast_PAIR <- function(count_table, metadata,category, herv, title = "Selected Counts", group = "2-side"){
+  count_hervs <- cbind(t(count_table[herv,rownames(metadata), drop = FALSE]), metadata[, category,drop = FALSE])
+  colnames(count_hervs) <- c("HERV","Category")
+  if(group == "2-side"){
+  herv_plot <- ggplot(count_hervs, aes(x = Category, y = HERV, color = Category)) + geom_boxplot(outlier.shape = NA)+ geom_jitter(size = 1, shape=16, position=position_jitter(0.2))+ stat_summary(fun.y=mean)+xlab(NULL)+ ylab(" Normalized Counts")+ggtitle(title)+theme(plot.title = element_text(size = 15, face = "bold"),axis.title=element_text(size=15,face="bold"),legend.title = element_text(size = 15,face="bold"),axis.text = element_text(size = 15),axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))+ theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))}
+  else{
+    herv_plot <- ggplot(count_hervs, aes(x = Category, y = HERV, color = Category)) + geom_boxplot(outlier.shape = NA)+ geom_jitter(size = 1, shape=16, position=position_jitter(0.2))+ stat_summary(fun.y=mean)+xlab(NULL)+ ylab(" Normalized Counts")+ggtitle(title)+theme(plot.title = element_text(size = 15, face = "bold"),axis.title=element_text(size=15,face="bold"),legend.title = element_text(size = 15,face="bold"),axis.text = element_text(size = 15),axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))+ theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + stat_compare_means(method = "anova", label.y = -5)+ stat_compare_means(method = "t.test", label = "p.signif", comparisons = my_comparisons) 
+    
+  }
+  return(print(herv_plot))}
+```
+
+##Anova Testing with post hoc T Test on Interferome Data for ERE induction
+```{r}
+pdf("Sig Test L1FLnI_5q32o.pdf", height = 6, width = 5)
+
+plot_contrast_PAIR(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_5q32o", title = "L1FLnI_5q32o", group = "multiple")
+
+dev.off()
+
+pdf("Sig Test LTR19_12p13.31.pdf", height = 6, width = 5)
+
+plot_contrast_PAIR(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "LTR19_12p13.31", title = "LTR19_12p13.31", group = "multiple")
+
+dev.off()
+
+pdf("Sig Test L1FLnI_1q23.1s.pdf", height = 6, width = 5)
+
+plot_contrast_PAIR(dfSigIntMat, metadata = meta_int, category = "Library.Name", herv = "L1FLnI_1q23.1s", title = "L1FLnI_1q23.1s", group = "multiple")
+
+dev.off()
+```
 
 
 
