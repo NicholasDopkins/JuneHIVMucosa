@@ -68,16 +68,16 @@ rownames(ddsf2) <- ddsf2$MIHIVode
 combined_ddsf <- cbind(ddsf2, ddsf[rownames(ddsf2),])
 ddsf <- combined_ddsf
 rownames(ddsf) <- ddsf$ï..Run
-ddsf[which(ddsf$disease == ""),"disease"] <- "HIVneg"
-ddsf[which(ddsf$disease == "HIV-1"),"disease"] <- "HIVpos"
+ddsf[which(ddsf$disease == ""),"disease"] <- "Control"
+ddsf[which(ddsf$disease == "HIV-1"),"disease"] <- "PLWH"
 dds <- DESeqDataSetFromMatrix(countData = raw_herv, colData = ddsf[colnames(raw_herv),], design = ~ disease)
-dds$disease <- relevel(dds$disease, ref = "HIVneg")
+dds$disease <- relevel(dds$disease, ref = "Control")
 dds <- DESeq(dds)
 resultsNames(dds)
 
 ##disease_HIVpos_vs_HIVneg.
 
-resultsdds <- results(dds, name = "disease_HIVpos_vs_HIVneg")
+resultsdds <- results(dds, name = "disease_PLWH_vs_Control")
 ```
 
 ##Make Volcano Plot Gut Biopses
@@ -95,7 +95,7 @@ keyvals.colour <- ifelse(
   names(keyvals.colour)[keyvals.colour == 'black'] <- 'Unchanged'
   names(keyvals.colour)[keyvals.colour == '#Ff6300'] <- 'Downregulated'
 
-EnhancedVolcano::EnhancedVolcano(resultsdds, lab = rownames(resultsdds), x = 'log2FoldChange', y = 'padj', title = 'HIVneg vs HIVpos Gut Biopsies', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', xlim = c(-4, 4), ylim = c(0, 15), colCustom = keyvals.colour)
+EnhancedVolcano::EnhancedVolcano(resultsdds, lab = rownames(resultsdds), x = 'log2FoldChange', y = 'padj', title = 'Controls vs PLWH Gut Biopsies', pCutoff = 0.05, FCcutoff = 1, labSize = 2.5,  labFace = 'bold', xlim = c(-4, 4), ylim = c(0, 15), colCustom = keyvals.colour)
 
 dev.off()
 ```
@@ -122,8 +122,8 @@ dev.off()
 #count_mat: the count matrix; meta = metadata; annotation = TE or gene annotation, the summary category table to build stack plot from; category = the category from annotation table to summarize from; cont = the contrast group from matadata
 annotation <- read.delim("TE_annotation.v2.0.tsv", row.names = 1)
 meta <- ddsf
-meta[which(meta$disease == ""),"disease"] <- "HIVneg"
-meta[which(meta$disease == "HIV-1"),"disease"] <- "HIVpos"
+meta[which(meta$disease == ""),"disease"] <- "Control"
+meta[which(meta$disease == "HIV-1"),"disease"] <- "PLWH"
   
 abundance_sum <- function(count_mat,meta, annotation, category, cont = "disease"){
   sum_table <- data.frame(matrix(ncol = 5))
@@ -172,8 +172,8 @@ herv_Family <- abundance_sum(count_mat = raw_herv,meta = meta, annotation = anno
 #group
 pdf("group_count.pdf", width=3.5, height=4)
 
-ggplot(herv_Category, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Category, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "HERV Category")) + scale_fill_brewer(palette="Paired") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+ggplot(herv_Category, aes(x = factor(disease, levels = c("Control", "PLWH")), y = AvgCount, fill = reorder(Category, -AvgCount))) + geom_bar(stat = "identity", size=0.1, colour = "white") + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "HERV Category")) + scale_fill_brewer(palette="Paired") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8)) + theme(axis.text.x = element_text(face = "bold", hjust=1, angle = 50))
 
 dev.off()
 
@@ -188,72 +188,72 @@ mycolors_TE_Chromosomes <- colorRampPalette(brewer.pal(12, "Paired"))(nb.cols_Ch
 #class
 pdf("group_class.pdf", width=3.5, height=4)
 
-ggplot(herv_Class, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Class, -AvgCount))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Class")) + scale_fill_brewer(palette="Paired")  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+ggplot(herv_Class, aes(x = factor(disease, levels = c("Control", "PLWH")), y = AvgCount, fill = reorder(Class, -AvgCount))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Class")) + scale_fill_brewer(palette="Paired")  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8)) + theme(axis.text.x = element_text(face = "bold", hjust=1, angle = 50))
 
 dev.off()
 
 #chrom
 pdf("group_chrom.pdf", width=4.5, height=4)
 
-ggplot(herv_Chrom, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Chrom, -AvgCount))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Chrom"))  + scale_fill_manual(values = mycolors_TE_Chromosomes)  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+ggplot(herv_Chrom, aes(x = factor(disease, levels = c("Control", "PLWH")), y = AvgCount, fill = reorder(Chrom, -AvgCount))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Chrom"))  + scale_fill_manual(values = mycolors_TE_Chromosomes)  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8)) + theme(axis.text.x = element_text(face = "bold", hjust=1, angle = 50))
 
 dev.off()
 
 #TE_type
 pdf("TE_type.pdf", width=3.5, height=4)
 
-ggplot(TE_type, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(TE_type, -AvgCount))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE type")) + scale_fill_brewer(palette="Paired")  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+ggplot(TE_type, aes(x = factor(disease, levels = c("Control", "PLWH")), y = AvgCount, fill = reorder(TE_type, -AvgCount))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE type")) + scale_fill_brewer(palette="Paired")  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8)) + theme(axis.text.x = element_text(face = "bold", hjust=1, angle = 50))
 
 dev.off()
 
 #Family
 pdf("TE Family.pdf", width=4.5, height=4)
 
-ggplot(herv_Family, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = AvgCount, fill = reorder(Family, -AvgCount))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Family"))  + scale_fill_manual(values = mycolors_TE_Family) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+ggplot(herv_Family, aes(x = factor(disease, levels = c("Control", "PLWH")), y = AvgCount, fill = reorder(Family, -AvgCount))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Average Count Per Sample") + guides(fill = guide_legend(title = "TE Family"))  + scale_fill_manual(values = mycolors_TE_Family) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8)) + theme(axis.text.x = element_text(face = "bold", hjust=1, angle = 50))
 
 dev.off()
 
 #groupPCT
 pdf("group_count_pct.pdf", width=3.5, height=4)
 
-ggplot(herv_Category, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Category, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "HERV Category")) + scale_fill_brewer(palette="Paired")  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+ggplot(herv_Category, aes(x = factor(disease, levels = c("Control", "PLWH")), y = PCT, fill = reorder(Category, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "HERV Category")) + scale_fill_brewer(palette="Paired")  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8)) + theme(axis.text.x = element_text(face = "bold", hjust=1, angle = 50))
 
 dev.off()
 
 #classPCT
 pdf("group_class_pct.pdf", width=3.5, height=4)
 
-ggplot(herv_Class, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Class, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Class")) + scale_fill_brewer(palette="Paired")  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+ggplot(herv_Class, aes(x = factor(disease, levels = c("Control", "PLWH")), y = PCT, fill = reorder(Class, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Class")) + scale_fill_brewer(palette="Paired")  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8)) + theme(axis.text.x = element_text(face = "bold", hjust=1, angle = 50))
 
 dev.off()
 
 #chromPCT
 pdf("group_chrom_pct.pdf", width=4.5, height=4)
 
-ggplot(herv_Chrom, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Chrom, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Chrom")) + scale_fill_manual(values = mycolors_TE_Chromosomes) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+ggplot(herv_Chrom, aes(x = factor(disease, levels = c("Control", "PLWH")), y = PCT, fill = reorder(Chrom, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Chrom")) + scale_fill_manual(values = mycolors_TE_Chromosomes) + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8)) + theme(axis.text.x = element_text(face = "bold", hjust=1, angle = 50))
 
 dev.off()
 
 #TE_typePCT
 pdf("TE_type_pct.pdf", width=3.5, height=4)
 
-ggplot(TE_type, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(TE_type, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE type")) + scale_fill_brewer(palette="Paired")  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+ggplot(TE_type, aes(x = factor(disease, levels = c("Control", "PLWH")), y = PCT, fill = reorder(TE_type, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE type")) + scale_fill_brewer(palette="Paired")  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8)) + theme(axis.text.x = element_text(face = "bold", hjust=1, angle = 50))
 
 dev.off()
 
 #familyPCT
 pdf("TE_family_pct.pdf", width=4.5, height=4)
 
-ggplot(herv_Family, aes(x = factor(disease, levels = c("HIVneg", "HIVpos")), y = PCT, fill = reorder(Family, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Family")) + scale_fill_manual(values = mycolors_TE_Family)  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8))
+ggplot(herv_Family, aes(x = factor(disease, levels = c("Control", "PLWH")), y = PCT, fill = reorder(Family, -PCT))) + geom_bar(stat = "identity", size=0) + xlab("")+ ylab("Percent Abundance") + guides(fill = guide_legend(title = "TE Family")) + scale_fill_manual(values = mycolors_TE_Family)  + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + theme(legend.key.size = unit(0.2, 'cm'), legend.text = element_text(size=6.8)) + theme(axis.text.x = element_text(face = "bold", hjust=1, angle = 50))
 
 dev.off()
 ```
@@ -723,17 +723,17 @@ dfGutAll <- dfGut %>% assay(.)
 dfGut <- dfGut[rownames(ddsSig),] %>% assay(.)
 
 #Set color scale to match rest of data (HIVpos=blue, HIVneg=red)
-annot_colors=list(disease=c(HIVneg="#F0978D",HIVpos="#63D7DE"))
+annot_colors=list(disease=c(Control="#F0978D",PLWH="#63D7DE"))
 
 pdf("Heatmap gut sig.pdf", height = 6, width = 4)
 dfGut <- dfGut[, rownames(meta)[order(meta$disease)]]
-pheatmap(dfGut, annotation_colors=annot_colors, scale="row",main = "HIVneg vs HIVpos Gut Biopsies",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE], color = hcl.colors(10000, "RdYlBu"))
+pheatmap(dfGut, annotation_colors=annot_colors, scale="row",main = "Control vs PLWH Gut Biopsies",fontsize = 5, size = 35, show_colnames = FALSE, show_rownames = TRUE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE], color = hcl.colors(10000, "RdYlBu"))
 
 dev.off()
 
 pdf("Heatmap gut all.pdf", height = 6, width = 4)
 dfGutAll_clust <- dfGutAll[, rownames(meta)[order(meta$disease)]]
-pheatmap(dfGutAll_clust, annotation_colors=annot_colors, scale="row",main = "HIVneg vs HIVpos Gut Biopsies",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE], color = hcl.colors(10000, "RdYlBu"))
+pheatmap(dfGutAll_clust, annotation_colors=annot_colors, scale="row",main = "Control vs PLWH Gut Biopsies",fontsize = 10, size = 35, show_colnames = FALSE, show_rownames = FALSE, cluster_cols = FALSE, cluster_rows = FALSE, legend_labels = "Expression Z-score", annotation_col = meta[,"disease",drop = FALSE], color = hcl.colors(10000, "RdYlBu"))
 
 dev.off()
 ```
@@ -1987,10 +1987,10 @@ raw_herv_PBMC <- raw_herv_PBMC[!(row.names(raw_herv_PBMC) %in% "__no_feature"),]
 ddsfPBMCFormat <- ddsf
 rownames(ddsfPBMCFormat) <- ddsfPBMCFormat$MIHIVode
 ddsPBMC <- DESeqDataSetFromMatrix(countData = raw_herv_PBMC, colData = ddsfPBMCFormat[colnames(raw_herv_PBMC),], design = ~ disease)
-ddsPBMC$disease <- relevel(ddsPBMC$disease, ref = "HIVneg")
+ddsPBMC$disease <- relevel(ddsPBMC$disease, ref = "Control")
 ddsPBMC <- DESeq(ddsPBMC)
 resultsNames(ddsPBMC)
-resultsddsPBMC <- results(ddsPBMC, name = "disease_HIVpos_vs_HIVneg")
+resultsddsPBMC <- results(ddsPBMC, name = "disease_PLWH_vs_Control")
 ```
 
 ##Make Volcano Plot PBMCs
@@ -2043,7 +2043,7 @@ dfPBMCAll <- dfPBMC %>% assay(.)
 dfPBMC <- dfPBMC[rownames(ddsSigPBMC),] %>% assay(.)
 
 #Set color scale to match rest of data (HIVpos=blue, HIVneg=red)
-annot_colors=list(disease=c(HIVneg="#F0978D",HIVpos="#63D7DE"))
+annot_colors=list(disease=c(Control="#F0978D",PLWH="#63D7DE"))
 
 pdf("Heatmap PBMC sig.pdf", height = 6, width = 4)
 dfPBMC <- dfPBMC[, rownames(ddsfPBMCFormat)[order(ddsfPBMCFormat$disease)]]
