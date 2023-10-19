@@ -112,7 +112,7 @@ screeplot(p, axisLabSize = 10, titleLabSize = 22)
 dev.off()
 
 pdf("biplot.pdf")
-biplot(p, lab = p$disease, labSize = 2, pointSize = 2, colby = 'disease', shape = 'Sex', legendTitleSize = 0, showLoadingsNames = TRUE, legendPosition = 'right', encircle = TRUE, xlim = c(-50,50), ylim = c(-60,60), title = 'HIVneg vs HIVpos Gut Biopsies') 
+biplot(p, lab = p$disease, labSize = 2, pointSize = 2, colby = 'disease', shape = 'Sex', legendTitleSize = 0, showLoadingsNames = TRUE, legendPosition = 'right', encircle = TRUE, xlim = c(-50,50), ylim = c(-60,60), title = 'Control vs PLWH Gut Biopsies') 
 
 dev.off()
 ```
@@ -557,7 +557,7 @@ screeplot(p_Interferome, axisLabSize = 10, titleLabSize = 22)
 dev.off()
 
 pdf("biplot_Interferome.pdf")
-biplot(p_Interferome, lab = p_Interferome$Library.Name, labSize = 2, legendTitleSize = 0, pointSize = 2, colby = 'Library.Name', showLoadingsNames = TRUE, legendPosition = 'right', encircle = TRUE, xlim = c(-50,50), ylim = c(-50,50), title = 'IFN Stimulation')
+biplot(p_Interferome, lab = p_Interferome$Library.Name, labSize = 2, legendTitleSize = 0, pointSize = 2, colby = 'Library.Name', showLoadingsNames = TRUE, legendPosition = 'right', encircle = TRUE, xlim = c(-50,50), ylim = c(-50,50), title = 'IFN-I Activated Gut CD4+ T Cells')
 
 dev.off()
 ```
