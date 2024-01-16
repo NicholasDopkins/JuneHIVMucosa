@@ -36,7 +36,7 @@ library(reshape)
 library(RColorBrewer)
 ```
 
-##Gut Biopses
+##Gut Biopsies
 
 ```{r}
 ##Set to personal directory
@@ -57,7 +57,7 @@ raw_herv <- raw_herv[rowSums(raw_herv > cutoff.count) > cutoff.sample, ]
 raw_herv <- raw_herv[!(row.names(raw_herv) %in% "__no_feature"),]
 ```
 
-##DESEQ2 Gut Biopses
+##DESEQ2 Gut Biopsies
 
 ```{r}
 ddsf <- read.csv(file = "PRJNA558500MetaData.csv")
@@ -80,7 +80,7 @@ resultsNames(dds)
 resultsdds <- results(dds, name = "disease_PLWH_vs_Control")
 ```
 
-##Make Volcano Plot Gut Biopses
+##Make Volcano Plot Gut Biopsies
 
 ```{r}
 pdf("HIV+ vs HIV-.pdf")
@@ -100,7 +100,7 @@ EnhancedVolcano::EnhancedVolcano(resultsdds, lab = rownames(resultsdds), x = 'lo
 dev.off()
 ```
 
-##Make PCA Gut Biopses
+##Make PCA Gut Biopsies
 
 ```{r}
 vst <- assay(vst(dds))
@@ -666,13 +666,13 @@ VennUp <- list(res_HIV_up, res_herv_pm_a1_vs_m_up, res_herv_pm_a2_vs_m_up, res_h
 
 pdf("Downregulated TEs Venn.pdf")
 
-ggVennDiagram(VennDown, label = "count", category.names = c("HIV gut biopses", "IFNa1","IFNa2","IFNa5", "IFNa8", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#Ff6300")
+ggVennDiagram(VennDown, label = "count", category.names = c("HIV gut biopsies", "IFNa1","IFNa2","IFNa5", "IFNa8", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#Ff6300")
 
 dev.off()
 
 pdf("Upregulated TEs Venn.pdf")
 
-ggVennDiagram(VennUp, label = "count", category.names = c("HIV gut biopses", "IFNa1","IFNa2","IFNa5", "IFNa8", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#063970")
+ggVennDiagram(VennUp, label = "count", category.names = c("HIV gut biopsies", "IFNa1","IFNa2","IFNa5", "IFNa8", "IFNa14", "IFNb")) + scale_fill_gradient(low = "#F4FAFE", high = "#063970")
 
 dev.off()
 ```
@@ -1631,6 +1631,13 @@ herv_table_cd4a$L1FLnI_1p31.1l <- as.numeric(herv_table_cd4a$L1FLnI_1p31.1l)
   ggplot(herv_table_cd4a, aes(x=viral_load, y = L1FLnI_1p31.1l, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("HIV-1 Copies/mL") + stat_cor(method = "pearson")
     dev.off()
 ```
+##CD4:CD8
+```{r}
+pdf("CD4 and CD8 ratio.pdf")
+  ggplot(herv_table_cd4a, aes(x=cd4_T_Cells_per_gram, y = cd8_T_Cells_per_gram, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD4 T Cells per gram") + ylab("CD8 T Cells per gram") + ylim(0,5000000) +xlim(0,5000000) +stat_cor(method = "pearson")
+    dev.off()
+```
+
 
 #3 TEs of further interest
 #TEs in which Pearson correlation for viral load possesses p value <0.1 and is reversal of the healthy control samples
