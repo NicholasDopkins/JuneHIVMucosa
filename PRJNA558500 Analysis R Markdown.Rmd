@@ -1636,88 +1636,69 @@ herv_table_cd4a$L1FLnI_1p31.1l <- as.numeric(herv_table_cd4a$L1FLnI_1p31.1l)
 ##CD4:CD8
 ```{r}
 pdf("CD4 and CD8 ratio.pdf")
-  ggplot(herv_table_cd4a, aes(x=cd4_T_Cells_per_gram, y = cd8_T_Cells_per_gram, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD4 T Cells per gram") + ylab("CD8 T Cells per gram") + ylim(0,5000000) +xlim(0,5000000) +stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a, aes(x=cd4_T_Cells_per_gram, y = cd8_T_Cells_per_gram, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD4 T Cells per gram") + ylab("CD8 T Cells per gram") + ylim(0,5000000) +xlim(0,5000000) +stat_cor(method = "spearman")
     dev.off()
 ```
 
 
 #3 TEs of further interest
-#TEs in which Pearson correlation for viral load possesses p value <0.1 and is reversal of the healthy control samples
-#L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s
+#TEs in which Spearman correlation for viral load possesses p value <0.05 and is reversal of the healthy control samples
+#LTR19_12p13.31, L1FLnI_1q23.1s
 
 #Gut CD4 T Cell Counts
 ```{r}
-#L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s
+# LTR19_12p13.31, L1FLnI_1q23.1s
     #cd4a = blood CD4 counts, cd4=gut CD4 counts
-pdf("L1FLnI_5q32o Gut CD4 Counts.pdf")
-  ggplot(herv_table_cd4a, aes(x=cd4, y = L1FLnI_5q32o, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Percent of CD45+ Cells") + stat_cor(method = "pearson")
-    dev.off()
 pdf("LTR19_12p13.31 Gut CD4 Counts.pdf")
-  ggplot(herv_table_cd4a, aes(x=cd4, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Percent of CD45+ Cells") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a, aes(x=cd4, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Percent of CD45+ Cells") + stat_cor(method = "spearman")
     dev.off()
+    
 pdf("L1FLnI_1q23.1s Gut CD4 Counts.pdf")
-  ggplot(herv_table_cd4a, aes(x=cd4, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Percent of CD45+ Cells") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a, aes(x=cd4, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Percent of CD45+ Cells") + stat_cor(method = "spearman")
     dev.off()
 ```
 
 #CD11c+ mDCs per gram
 ```{r}
-#L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s
-
-herv_table_cd4a_CD11cpos_mDCs_per_gram_sub$L1FLnI_5q32o <- as.numeric(herv_table_cd4a_CD11cpos_mDCs_per_gram_sub$L1FLnI_5q32o)
-pdf("L1FLnI_5q32o Gut CD11c+ mDCs per gram.pdf")
-  ggplot(herv_table_cd4a_CD11cpos_mDCs_per_gram_sub, aes(x=CD11cpos_mDCs_per_gram, y = L1FLnI_5q32o, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD11c+ mDCs per gram (colon)") + stat_cor(method = "pearson")
-    dev.off()
-    
+#LTR19_12p13.31, L1FLnI_1q23.1s
 herv_table_cd4a_CD11cpos_mDCs_per_gram_sub$LTR19_12p13.31 <- as.numeric(herv_table_cd4a_CD11cpos_mDCs_per_gram_sub$LTR19_12p13.31)
 pdf("LTR19_12p13.31 Gut CD11c+ mDCs per gram.pdf")
-  ggplot(herv_table_cd4a_CD11cpos_mDCs_per_gram_sub, aes(x=CD11cpos_mDCs_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD11c+ mDCs per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_CD11cpos_mDCs_per_gram_sub, aes(x=CD11cpos_mDCs_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD11c+ mDCs per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
     
 herv_table_cd4a_CD11cpos_mDCs_per_gram_sub$L1FLnI_1q23.1s <- as.numeric(herv_table_cd4a_CD11cpos_mDCs_per_gram_sub$L1FLnI_1q23.1s)
 pdf("L1FLnI_1q23.1s Gut CD11c+ mDCs per gram.pdf")
-  ggplot(herv_table_cd4a_CD11cpos_mDCs_per_gram_sub, aes(x=CD11cpos_mDCs_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD11c+ mDCs per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_CD11cpos_mDCs_per_gram_sub, aes(x=CD11cpos_mDCs_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD11c+ mDCs per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
  
 ```
 
 #CD1c- mDCs per gram
 ```{r}
-#L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s
-
-herv_table_cd4a_CD1cneg_mDCs_per_gram_sub$L1FLnI_5q32o <- as.numeric(herv_table_cd4a_CD1cneg_mDCs_per_gram_sub$L1FLnI_5q32o)
-pdf("L1FLnI_5q32o Gut CD1c- mDCs per gram.pdf")
-  ggplot(herv_table_cd4a_CD1cneg_mDCs_per_gram_sub, aes(x=CD1cneg_mDCs_per_gram, y = L1FLnI_5q32o, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD1c- mDCs per gram (colon)") + stat_cor(method = "pearson")
-    dev.off()
-    
+#LTR19_12p13.31, L1FLnI_1q23.1s
 herv_table_cd4a_CD1cneg_mDCs_per_gram_sub$LTR19_12p13.31 <- as.numeric(herv_table_cd4a_CD1cneg_mDCs_per_gram_sub$LTR19_12p13.31)
 pdf("LTR19_12p13.31 Gut CD1c- mDCs per gram.pdf")
-  ggplot(herv_table_cd4a_CD1cneg_mDCs_per_gram_sub, aes(x=CD1cneg_mDCs_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD1c- mDCs per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_CD1cneg_mDCs_per_gram_sub, aes(x=CD1cneg_mDCs_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD1c- mDCs per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
     
 herv_table_cd4a_CD1cneg_mDCs_per_gram_sub$L1FLnI_1q23.1s <- as.numeric(herv_table_cd4a_CD1cneg_mDCs_per_gram_sub$L1FLnI_1q23.1s)
 pdf("L1FLnI_1q23.1s Gut CD1c- mDCs per gram.pdf")
-  ggplot(herv_table_cd4a_CD1cneg_mDCs_per_gram_sub, aes(x=CD1cneg_mDCs_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD1c- mDCs per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_CD1cneg_mDCs_per_gram_sub, aes(x=CD1cneg_mDCs_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD1c- mDCs per gram (colon)") + stat_cor(method = "spearman")
 ```
 
 
 #CD1c+ mDCs per gram
 ```{r}
-#L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s
-
-herv_table_cd4a_CD1cpos_mDCs_per_gram_sub$L1FLnI_5q32o <- as.numeric(herv_table_cd4a_CD1cpos_mDCs_per_gram_sub$L1FLnI_5q32o)
-pdf("L1FLnI_5q32o Gut CD1c+ mDCs per gram.pdf")
-  ggplot(herv_table_cd4a_CD1cpos_mDCs_per_gram_sub, aes(x=CD1cpos_mDCs_per_gram, y = L1FLnI_5q32o, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD1c+ mDCs per gram (colon)") + stat_cor(method = "pearson")
-    dev.off()
-    
+#LTR19_12p13.31, L1FLnI_1q23.1s
+   
 herv_table_cd4a_CD1cpos_mDCs_per_gram_sub$LTR19_12p13.31 <- as.numeric(herv_table_cd4a_CD1cpos_mDCs_per_gram_sub$LTR19_12p13.31)
 pdf("LTR19_12p13.31 Gut CD1c+ mDCs per gram.pdf")
-  ggplot(herv_table_cd4a_CD1cpos_mDCs_per_gram_sub, aes(x=CD1cpos_mDCs_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD1c+ mDCs per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_CD1cpos_mDCs_per_gram_sub, aes(x=CD1cpos_mDCs_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD1c+ mDCs per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
     
 herv_table_cd4a_CD1cpos_mDCs_per_gram_sub$L1FLnI_1q23.1s <- as.numeric(herv_table_cd4a_CD1cpos_mDCs_per_gram_sub$L1FLnI_1q23.1s)
 pdf("L1FLnI_1q23.1s Gut CD1c+ mDCs per gram.pdf")
-  ggplot(herv_table_cd4a_CD1cpos_mDCs_per_gram_sub, aes(x=CD1cpos_mDCs_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD1c+ mDCs per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_CD1cpos_mDCs_per_gram_sub, aes(x=CD1cpos_mDCs_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD1c+ mDCs per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
   
 ```
@@ -1725,42 +1706,30 @@ pdf("L1FLnI_1q23.1s Gut CD1c+ mDCs per gram.pdf")
 
 #Gut CD4+T Cells per gram
 ```{r}
-#L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s
-
-herv_table_cd4a_CD4_T_Cells_per_gram_sub$L1FLnI_5q32o <- as.numeric(herv_table_cd4a_CD4_T_Cells_per_gram_sub$L1FLnI_5q32o)
-pdf("L1FLnI_5q32o Gut CD4+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_CD4_T_Cells_per_gram_sub, aes(x=cd4_T_Cells_per_gram, y = L1FLnI_5q32o, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD4+ T Cells per gram (colon)") + stat_cor(method = "pearson")
-    dev.off()
-    
+#LTR19_12p13.31, L1FLnI_1q23.1s
 herv_table_cd4a_CD4_T_Cells_per_gram_sub$LTR19_12p13.31 <- as.numeric(herv_table_cd4a_CD4_T_Cells_per_gram_sub$LTR19_12p13.31)
 pdf("LTR19_12p13.31 Gut CD4+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_CD4_T_Cells_per_gram_sub, aes(x=cd4_T_Cells_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD4+ T Cells per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_CD4_T_Cells_per_gram_sub, aes(x=cd4_T_Cells_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD4+ T Cells per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
     
 herv_table_cd4a_CD4_T_Cells_per_gram_sub$L1FLnI_1q23.1s <- as.numeric(herv_table_cd4a_CD4_T_Cells_per_gram_sub$L1FLnI_1q23.1s)
 pdf("L1FLnI_1q23.1s Gut CD4+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_CD4_T_Cells_per_gram_sub, aes(x=cd4_T_Cells_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD4+ T Cells per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_CD4_T_Cells_per_gram_sub, aes(x=cd4_T_Cells_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD4+ T Cells per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
     
 ```
 
 #Gut CD8+T Cells per gram
 ```{r}
-#L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s
-
-herv_table_cd4a_CD8_T_Cells_per_gram_sub$L1FLnI_5q32o <- as.numeric(herv_table_cd4a_CD8_T_Cells_per_gram_sub$L1FLnI_5q32o)
-pdf("L1FLnI_5q32o Gut CD8+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_CD8_T_Cells_per_gram_sub, aes(x=cd8_T_Cells_per_gram, y = L1FLnI_5q32o, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD8+ T Cells per gram (colon)") + stat_cor(method = "pearson")
-    dev.off()
-    
+#LTR19_12p13.31, L1FLnI_1q23.1s
 herv_table_cd4a_CD8_T_Cells_per_gram_sub$LTR19_12p13.31 <- as.numeric(herv_table_cd4a_CD8_T_Cells_per_gram_sub$LTR19_12p13.31)
 pdf("LTR19_12p13.31 Gut CD8+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_CD8_T_Cells_per_gram_sub, aes(x=cd8_T_Cells_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD8+ T Cells per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_CD8_T_Cells_per_gram_sub, aes(x=cd8_T_Cells_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD8+ T Cells per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
     
 herv_table_cd4a_CD8_T_Cells_per_gram_sub$L1FLnI_1q23.1s <- as.numeric(herv_table_cd4a_CD8_T_Cells_per_gram_sub$L1FLnI_1q23.1s)
 pdf("L1FLnI_1q23.1s Gut CD8+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_CD8_T_Cells_per_gram_sub, aes(x=cd8_T_Cells_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD8+ T Cells per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_CD8_T_Cells_per_gram_sub, aes(x=cd8_T_Cells_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("CD8+ T Cells per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
   
 ```
@@ -1768,164 +1737,119 @@ pdf("L1FLnI_1q23.1s Gut CD8+ T Cells per gram.pdf")
 
 #Gut IFNy-IL17+T CD4+ T Cells per gram
 ```{r}
-#L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s
-
-herv_table_cd4a_IFNYnegIL17pos_CD4_T_Cells_per_gram_sub$L1FLnI_5q32o <- as.numeric(herv_table_cd4a_IFNYnegIL17pos_CD4_T_Cells_per_gram_sub$L1FLnI_5q32o)
-pdf("L1FLnI_5q32o Gut IFNy-IL17+T CD4+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_IFNYnegIL17pos_CD4_T_Cells_per_gram_sub, aes(x=IFNYnegIL17pos_CD4_T_Cells_per_gram, y = L1FLnI_5q32o, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy-IL17+T CD4+ T Cells per gram (colon)") + stat_cor(method = "pearson")
-    dev.off()
-    
+#LTR19_12p13.31, L1FLnI_1q23.1s
 herv_table_cd4a_IFNYnegIL17pos_CD4_T_Cells_per_gram_sub$LTR19_12p13.31 <- as.numeric(herv_table_cd4a_IFNYnegIL17pos_CD4_T_Cells_per_gram_sub$LTR19_12p13.31)
 pdf("LTR19_12p13.31 Gut IFNy-IL17+T CD4+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_IFNYnegIL17pos_CD4_T_Cells_per_gram_sub, aes(x=IFNYnegIL17pos_CD4_T_Cells_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Gut IFNy-IL17+T CD4+ T Cells per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_IFNYnegIL17pos_CD4_T_Cells_per_gram_sub, aes(x=IFNYnegIL17pos_CD4_T_Cells_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Gut IFNy-IL17+T CD4+ T Cells per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
     
 herv_table_cd4a_IFNYnegIL17pos_CD4_T_Cells_per_gram_sub$L1FLnI_1q23.1s <- as.numeric(herv_table_cd4a_IFNYnegIL17pos_CD4_T_Cells_per_gram_sub$L1FLnI_1q23.1s)
 pdf("L1FLnI_1q23.1s Gut IFNy-IL17+T CD4+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_IFNYnegIL17pos_CD4_T_Cells_per_gram_sub, aes(x=IFNYnegIL17pos_CD4_T_Cells_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Gut IFNy-IL17+T CD4+ T Cells per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_IFNYnegIL17pos_CD4_T_Cells_per_gram_sub, aes(x=IFNYnegIL17pos_CD4_T_Cells_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Gut IFNy-IL17+T CD4+ T Cells per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
     
 ```
 
 #Gut IFNy+ CD8+T Cells per gram
 ```{r}
-#L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s
-
-herv_table_cd4a_IFNYpos_cd8_T_Cells_per_gram_sub$L1FLnI_5q32o <- as.numeric(herv_table_cd4a_IFNYpos_cd8_T_Cells_per_gram_sub$L1FLnI_5q32o)
-pdf("L1FLnI_5q32o Gut IFNy+ CD8+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_IFNYpos_cd8_T_Cells_per_gram_sub, aes(x=IFNYpos_cd8_T_Cells_per_gram, y = L1FLnI_5q32o, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy+ CD8+ T Cells per gram (colon)") + stat_cor(method = "pearson")
-    dev.off()
-    
+#LTR19_12p13.31, L1FLnI_1q23.1s
 herv_table_cd4a_IFNYpos_cd8_T_Cells_per_gram_sub$LTR19_12p13.31 <- as.numeric(herv_table_cd4a_IFNYpos_cd8_T_Cells_per_gram_sub$LTR19_12p13.31)
 pdf("LTR19_12p13.31 Gut IFNy+ CD8+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_IFNYpos_cd8_T_Cells_per_gram_sub, aes(x=IFNYpos_cd8_T_Cells_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy+ CD8+ T Cells per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_IFNYpos_cd8_T_Cells_per_gram_sub, aes(x=IFNYpos_cd8_T_Cells_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy+ CD8+ T Cells per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
     
 herv_table_cd4a_IFNYpos_cd8_T_Cells_per_gram_sub$L1FLnI_1q23.1s <- as.numeric(herv_table_cd4a_IFNYpos_cd8_T_Cells_per_gram_sub$L1FLnI_1q23.1s)
 pdf("L1FLnI_1q23.1s Gut IFNy+ CD8+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_IFNYpos_cd8_T_Cells_per_gram_sub, aes(x=IFNYpos_cd8_T_Cells_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy+ CD8+ T Cells per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_IFNYpos_cd8_T_Cells_per_gram_sub, aes(x=IFNYpos_cd8_T_Cells_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy+ CD8+ T Cells per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
     
 ```
 
 #Gut IFNy+IL17-T CD4+ T Cells per gram
 ```{r}
-#L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s
-
-herv_table_cd4a_IFNYposIL17neg_CD4_T_Cells_per_gram_sub$L1FLnI_5q32o <- as.numeric(herv_table_cd4a_IFNYposIL17neg_CD4_T_Cells_per_gram_sub$L1FLnI_5q32o)
-pdf("L1FLnI_5q32o Gut IFNy+IL17-T CD4+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_IFNYposIL17neg_CD4_T_Cells_per_gram_sub, aes(x=IFNYposIL17neg_CD4_T_Cells_per_gram, y = L1FLnI_5q32o, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy+IL17-T CD4+ T Cells per gram (colon)") + stat_cor(method = "pearson")
-    dev.off()
-    
+#LTR19_12p13.31, L1FLnI_1q23.1s
 herv_table_cd4a_IFNYposIL17neg_CD4_T_Cells_per_gram_sub$LTR19_12p13.31 <- as.numeric(herv_table_cd4a_IFNYposIL17neg_CD4_T_Cells_per_gram_sub$LTR19_12p13.31)
 pdf("LTR19_12p13.31 Gut IFNy+IL17-T CD4+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_IFNYposIL17neg_CD4_T_Cells_per_gram_sub, aes(x=IFNYposIL17neg_CD4_T_Cells_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy+IL17-T CD4+ T Cells per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_IFNYposIL17neg_CD4_T_Cells_per_gram_sub, aes(x=IFNYposIL17neg_CD4_T_Cells_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy+IL17-T CD4+ T Cells per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
     
 herv_table_cd4a_IFNYposIL17neg_CD4_T_Cells_per_gram_sub$L1FLnI_1q23.1s <- as.numeric(herv_table_cd4a_IFNYposIL17neg_CD4_T_Cells_per_gram_sub$L1FLnI_1q23.1s)
 pdf("L1FLnI_1q23.1s Gut IFNy+IL17-T CD4+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_IFNYposIL17neg_CD4_T_Cells_per_gram_sub, aes(x=IFNYposIL17neg_CD4_T_Cells_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy+IL17-T CD4+ T Cells per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_IFNYposIL17neg_CD4_T_Cells_per_gram_sub, aes(x=IFNYposIL17neg_CD4_T_Cells_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy+IL17-T CD4+ T Cells per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
 ```
 
 #Gut IFNy+IL17+T CD4+ T Cells per gram
 ```{r}
-#L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s
-
-herv_table_cd4a_IFNYposIL17pos_CD4_T_Cells_per_gram_sub$L1FLnI_5q32o <- as.numeric(herv_table_cd4a_IFNYposIL17pos_CD4_T_Cells_per_gram_sub$L1FLnI_5q32o)
-pdf("L1FLnI_5q32o Gut IFNy+IL17+ T CD4+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_IFNYposIL17pos_CD4_T_Cells_per_gram_sub, aes(x=IFNYposIL17pos_CD4_T_Cells_per_gram, y = L1FLnI_5q32o, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy+IL17+T CD4+ T Cells per gram (colon)") + stat_cor(method = "pearson")
-    dev.off()
-    
+#LTR19_12p13.31, L1FLnI_1q23.1s
 herv_table_cd4a_IFNYposIL17pos_CD4_T_Cells_per_gram_sub$LTR19_12p13.31 <- as.numeric(herv_table_cd4a_IFNYposIL17pos_CD4_T_Cells_per_gram_sub$LTR19_12p13.31)
 pdf("LTR19_12p13.31 Gut IFNy+IL17+ T CD4+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_IFNYposIL17pos_CD4_T_Cells_per_gram_sub, aes(x=IFNYposIL17pos_CD4_T_Cells_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy+IL17+T CD4+ T Cells per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_IFNYposIL17pos_CD4_T_Cells_per_gram_sub, aes(x=IFNYposIL17pos_CD4_T_Cells_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy+IL17+T CD4+ T Cells per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
     
 herv_table_cd4a_IFNYposIL17pos_CD4_T_Cells_per_gram_sub$L1FLnI_1q23.1s <- as.numeric(herv_table_cd4a_IFNYposIL17pos_CD4_T_Cells_per_gram_sub$L1FLnI_1q23.1s)
 pdf("L1FLnI_1q23.1s Gut IFNy+IL17+ T CD4+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_IFNYposIL17pos_CD4_T_Cells_per_gram_sub, aes(x=IFNYposIL17pos_CD4_T_Cells_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy+IL17+T CD4+ T Cells per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_IFNYposIL17pos_CD4_T_Cells_per_gram_sub, aes(x=IFNYposIL17pos_CD4_T_Cells_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IFNy+IL17+T CD4+ T Cells per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
 ```
 
 #Gut IL22+IFNy-IL17- T CD4+ T Cells per gram
 ```{r}
-#L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s
-
-herv_table_cd4a_IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram_sub$L1FLnI_5q32o <- as.numeric(herv_table_cd4a_IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram_sub$L1FLnI_5q32o)
-pdf("L1FLnI_5q32o Gut IL22+IFNy-IL17-T CD4+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram_sub, aes(x=IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, y = L1FLnI_5q32o, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IL22+IFNy-IL17-T CD4+ T Cells per gram (colon)") + stat_cor(method = "pearson")
-    dev.off()
-    
+#LTR19_12p13.31, L1FLnI_1q23.1s
 herv_table_cd4a_IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram_sub$LTR19_12p13.31 <- as.numeric(herv_table_cd4a_IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram_sub$LTR19_12p13.31)
 pdf("LTR19_12p13.31 Gut IL22+IFNy-IL17-T CD4+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram_sub, aes(x=IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IL22+IFNy-IL17-T CD4+ T Cells per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram_sub, aes(x=IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IL22+IFNy-IL17-T CD4+ T Cells per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
     
 herv_table_cd4a_IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram_sub$L1FLnI_1q23.1s <- as.numeric(herv_table_cd4a_IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram_sub$L1FLnI_1q23.1s)
 pdf("L1FLnI_1q23.1s Gut IL22+IFNy-IL17-T CD4+ T Cells per gram.pdf")
-  ggplot(herv_table_cd4a_IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram_sub, aes(x=IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IL22+IFNy-IL17-T CD4+ T Cells per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram_sub, aes(x=IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("IL22+IFNy-IL17-T CD4+ T Cells per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
 ```
 
 
 #Serum IL-6
 ```{r}
-#L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s
-
-herv_table_cd4a_IL6_sub$L1FLnI_5q32o <- as.numeric(herv_table_cd4a_IL6_sub$L1FLnI_5q32o)
-pdf("L1FLnI_5q32o Serum IL-6.pdf")
-  ggplot(herv_table_cd4a_IL6_sub, aes(x=IL6, y = L1FLnI_5q32o, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Serum IL-6") + stat_cor(method = "pearson")
-    dev.off()
-    
+#LTR19_12p13.31, L1FLnI_1q23.1s
+   
 herv_table_cd4a_IL6_sub$LTR19_12p13.31 <- as.numeric(herv_table_cd4a_IL6_sub$LTR19_12p13.31)
 pdf("LTR19_12p13.31 Serum IL-6.pdf")
-  ggplot(herv_table_cd4a_IL6_sub, aes(x=IL6, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Serum IL-6") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_IL6_sub, aes(x=IL6, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Serum IL-6") + stat_cor(method = "spearman")
     dev.off()
     
 herv_table_cd4a_IL6_sub$L1FLnI_1q23.1s <- as.numeric(herv_table_cd4a_IL6_sub$L1FLnI_1q23.1s)
 pdf("L1FLnI_1q23.1s Serum IL-6.pdf")
-  ggplot(herv_table_cd4a_IL6_sub, aes(x=IL6, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Serum IL-6") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_IL6_sub, aes(x=IL6, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Serum IL-6") + stat_cor(method = "spearman")
     dev.off()
 ```
 
 #Serum LPS
 ```{r}
-#L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s
-
-herv_table_cd4a_LPS_sub$L1FLnI_5q32o <- as.numeric(herv_table_cd4a_LPS_sub$L1FLnI_5q32o)
-pdf("L1FLnI_5q32o Serum LPS.pdf")
-  ggplot(herv_table_cd4a_LPS_sub, aes(x=LPS, y = L1FLnI_5q32o, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Serum LPS") + stat_cor(method = "pearson")
-    dev.off()
-    
+#LTR19_12p13.31, L1FLnI_1q23.1s
+   
 herv_table_cd4a_LPS_sub$LTR19_12p13.31 <- as.numeric(herv_table_cd4a_LPS_sub$LTR19_12p13.31)
 pdf("LTR19_12p13.31 Serum LPS.pdf")
-  ggplot(herv_table_cd4a_LPS_sub, aes(x=LPS, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Serum LPS") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_LPS_sub, aes(x=LPS, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Serum LPS") + stat_cor(method = "spearman")
     dev.off()
     
 herv_table_cd4a_LPS_sub$L1FLnI_1q23.1s <- as.numeric(herv_table_cd4a_LPS_sub$L1FLnI_1q23.1s)
 pdf("L1FLnI_1q23.1s Serum LPS.pdf")
-  ggplot(herv_table_cd4a_LPS_sub, aes(x=LPS, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Serum LPS") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_LPS_sub, aes(x=LPS, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("Serum LPS") + stat_cor(method = "spearman")
     dev.off()
 ```
 
 #pDCs per gram (colon)
 ```{r}
-#L1FLnI_5q32o, LTR19_12p13.31, L1FLnI_1q23.1s
+#LTR19_12p13.31, L1FLnI_1q23.1s
 
-herv_table_cd4a_pDCs_per_gram_sub$L1FLnI_5q32o <- as.numeric(herv_table_cd4a_pDCs_per_gram_sub$L1FLnI_5q32o)
-pdf("L1FLnI_5q32o Gut pDCs per gram.pdf")
-  ggplot(herv_table_cd4a_pDCs_per_gram_sub, aes(x=pDCs_per_gram, y = L1FLnI_5q32o, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("pDCs per gram (colon)") + stat_cor(method = "pearson")
-    dev.off()
-    
 herv_table_cd4a_pDCs_per_gram_sub$LTR19_12p13.31 <- as.numeric(herv_table_cd4a_pDCs_per_gram_sub$LTR19_12p13.31)
 pdf("LTR19_12p13.31 Gut pDCs per gram.pdf")
-  ggplot(herv_table_cd4a_pDCs_per_gram_sub, aes(x=pDCs_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("pDCs per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_pDCs_per_gram_sub, aes(x=pDCs_per_gram, y = LTR19_12p13.31, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("pDCs per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
     
 herv_table_cd4a_pDCs_per_gram_sub$L1FLnI_1q23.1s <- as.numeric(herv_table_cd4a_pDCs_per_gram_sub$L1FLnI_1q23.1s)
 pdf("L1FLnI_1q23.1s Gut pDCs per gram.pdf")
-  ggplot(herv_table_cd4a_pDCs_per_gram_sub, aes(x=pDCs_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("pDCs per gram (colon)") + stat_cor(method = "pearson")
+  ggplot(herv_table_cd4a_pDCs_per_gram_sub, aes(x=pDCs_per_gram, y = L1FLnI_1q23.1s, col = disease )) + geom_point() + theme_bw() + geom_smooth(method=lm)  + xlab("pDCs per gram (colon)") + stat_cor(method = "spearman")
     dev.off()
 ```
 
