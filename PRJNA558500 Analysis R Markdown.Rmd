@@ -2063,7 +2063,7 @@ plot_contrast_PAIR <- function(count_table, metadata,category, herv, title = "Se
 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))}
   else{
     herv_plot <- ggplot(count_hervs, aes(x = Category, y = HERV, color = Category)) + geom_boxplot(outlier.shape = NA)+ geom_jitter(size = 1, shape=16, position=position_jitter(0.2))+ stat_summary(fun.y=mean)+xlab(NULL)+ ylab(" Normalized Counts")+ggtitle(title)+theme(plot.title = element_text(size = 15, face = "bold"),axis.title=element_text(size=15,face="bold"),legend.title = element_text(size = 15,face="bold"),axis.text = element_text(size = 15),axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))+ theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + stat_compare_means(method = "anova", label.y = -5)+ stat_compare_means(method = "t.test", label = "p =", comparisons = my_comparisons) 
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + stat_compare_means(method = "anova", label.y = -5)+ stat_compare_means(p.adjust.method = "bonferroni", method = "t.test", label = "p =", comparisons = my_comparisons) 
     
   }
   return(print(herv_plot))}
