@@ -2055,16 +2055,35 @@ bartlett.test(LTR19_12p13.31 ~ Library.Name, data = t_dtMat_Int)
 ```
 
 
-#95% Confidence Interval Reporting for Correlations
+#95% Confidence Interval and S Value Reporting for Spearman Correlations
 ```{r}
 herv_table_HIVpos <- herv_table_cd4a %>% filter(viral_load > 1)
 herv_table_HIVneg <- herv_table_cd4a %>% filter(viral_load < 1)
 
+
+#Viral Load
 cor.test(herv_table_HIVpos$viral_load, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
 spearman.ci(herv_table_HIVpos$viral_load, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
 
 cor.test(herv_table_HIVpos$viral_load, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
 spearman.ci(herv_table_HIVpos$viral_load, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
 
+#Gut CD4 T Cells
+cor.test(herv_table_HIVneg$cd4_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$cd4_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$cd4_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$cd4_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
+
+
+cor.test(herv_table_HIVneg$cd4_T_Cells_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$cd4_T_Cells_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$cd4_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$cd4_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
 ```
 
