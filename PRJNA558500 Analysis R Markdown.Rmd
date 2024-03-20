@@ -15,6 +15,7 @@ library(tidyverse)
 library(data.table)
 library(PCAtools)
 library(dplyr)
+library(RVAideMemoire)
 library(matrixStats)
 library(edgeR)
 library(DESeq2)
@@ -1870,7 +1871,8 @@ sam_names_dir_PBMC <- gsub(paste("pbmc/telescope/","\\/",sep = ""),"",list.dirs(
 
 ####load_telescope_reports - files: give a list of paths that contain the telescope reports, colnames: column names 
 raw_herv_PBMC <- load_telescope_reports(files = paste("pbmc/telescope/",sam_names_dir_PBMC,"/",sam_names_dir_PBMC,".tsv", sep = ""), colnames = sam_names_dir_PBMC)
-
+##export 
+write.csv(raw_herv_PBMC, "PBMC_Telescope_Output.csv", row.names=TRUE)
 
 ##filter lowly abundant retrotransposons
 cutoff.count <- 2
@@ -1884,10 +1886,10 @@ raw_herv_PBMC <- raw_herv_PBMC[!(row.names(raw_herv_PBMC) %in% "__no_feature"),]
 ddsfPBMCFormat <- ddsf
 rownames(ddsfPBMCFormat) <- ddsfPBMCFormat$MIHIVode
 ddsPBMC <- DESeqDataSetFromMatrix(countData = raw_herv_PBMC, colData = ddsfPBMCFormat[colnames(raw_herv_PBMC),], design = ~ disease)
-ddsPBMC$disease <- relevel(ddsPBMC$disease, ref = "Control")
+ddsPBMC$disease <- relevel(ddsPBMC$disease, ref = "HIVneg")
 ddsPBMC <- DESeq(ddsPBMC)
 resultsNames(ddsPBMC)
-resultsddsPBMC <- results(ddsPBMC, name = "disease_PLWH_vs_Control")
+resultsddsPBMC <- results(ddsPBMC, name = "disease_HIVpos_vs_HIVneg")
 ```
 
 ##Make Volcano Plot PBMCs
@@ -2024,4 +2026,45 @@ dev.off()
 ```
 
 
+
+
+#Varience Testing
+
+```{r}
+#Gut
+t_dtMat <- t(dtMat)
+t_dtMat <- as.data.frame(t_dtMat)
+t_dtMat <- merge(t_dtMat,ddsf, by="row.names",all.x=TRUE)
+var.test(LTR19_12p13.31 ~ disease, data = t_dtMat)
+var.test(L1FLnI_1q23.1s ~ disease, data = t_dtMat)
+
+#PBMC
+t_dtMat_PBMC <- t(dtMat_PBMC)
+t_dtMat_PBMC <- as.data.frame(t_dtMat_PBMC)
+t_dtMat_PBMC <- merge(t_dtMat_PBMC,ddsfPBMCFormat, by="row.names",all.x=TRUE)
+var.test(LTR19_12p13.31 ~ disease, data = t_dtMat_PBMC)
+var.test(L1FLnI_1q23.1s ~ disease, data = t_dtMat_PBMC)
+
+#Interferome
+t_dtMat_Int <- t(dfSigIntMat)
+t_dtMat_Int <- as.data.frame(t_dtMat_Int)
+t_dtMat_Int <- merge(ddsf_Interferome, t_dtMat_Int, by="row.names", all.x=TRUE)
+bartlett.test(L1FLnI_1q23.1s ~ Library.Name, data = t_dtMat_Int)
+bartlett.test(LTR19_12p13.31 ~ Library.Name, data = t_dtMat_Int)
+
+```
+
+
+#95% Confidence Interval Reporting for Correlations
+```{r}
+herv_table_HIVpos <- herv_table_cd4a %>% filter(viral_load > 1)
+herv_table_HIVneg <- herv_table_cd4a %>% filter(viral_load < 1)
+
+cor.test(herv_table_HIVpos$viral_load, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+spearman.ci(herv_table_HIVpos$viral_load, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$viral_load, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+spearman.ci(herv_table_HIVpos$viral_load, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
+
+```
 
