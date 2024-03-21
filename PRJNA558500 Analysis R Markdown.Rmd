@@ -2068,7 +2068,13 @@ spearman.ci(herv_table_HIVpos$viral_load, herv_table_HIVpos$LTR19_12p13.31, conf
 cor.test(herv_table_HIVpos$viral_load, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
 spearman.ci(herv_table_HIVpos$viral_load, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
 
-#Gut CD4 T Cells
+cor.test(herv_table_HIVpos$viral_load, herv_table_HIVpos$L1FLnI_3q26.31h, method = "spearman", conf.level = 0.95)
+spearman.ci(herv_table_HIVpos$viral_load, herv_table_HIVpos$L1FLnI_3q26.31h, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$viral_load, herv_table_HIVpos$L1FLnI_4q21.21x, method = "spearman", conf.level = 0.95)
+spearman.ci(herv_table_HIVpos$viral_load, herv_table_HIVpos$L1FLnI_4q21.21x, conf.level = 0.95)
+
+#CD4 T Cells
 cor.test(herv_table_HIVneg$cd4_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
 
 spearman.ci(herv_table_HIVneg$cd4_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, conf.level = 0.95)
@@ -2085,5 +2091,235 @@ spearman.ci(herv_table_HIVneg$cd4_T_Cells_per_gram, herv_table_HIVneg$L1FLnI_1q2
 cor.test(herv_table_HIVpos$cd4_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
 
 spearman.ci(herv_table_HIVpos$cd4_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
+
+#CD8 T Cells
+cor.test(herv_table_HIVneg$cd8_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$cd8_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$cd8_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$cd8_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
+
+
+cor.test(herv_table_HIVneg$cd8_T_Cells_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$cd8_T_Cells_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$cd8_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$cd8_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
+
+#IFNy+CD8 T Cells
+cor.test(herv_table_HIVneg$IFNYpos_cd8_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$IFNYpos_cd8_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$IFNYpos_cd8_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$IFNYpos_cd8_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
+
+
+cor.test(herv_table_HIVneg$IFNYpos_cd8_T_Cells_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$IFNYpos_cd8_T_Cells_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$IFNYpos_cd8_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$IFNYpos_cd8_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
+
+
+#CD11c+ mDC Cells
+cor.test(herv_table_HIVneg$CD11cpos_mDCs_per_gram, herv_table_HIVneg$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$CD11cpos_mDCs_per_gram, herv_table_HIVneg$LTR19_12p13.31, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$CD11cpos_mDCs_per_gram, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$CD11cpos_mDCs_per_gram, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
+
+
+cor.test(herv_table_HIVneg$CD11cpos_mDCs_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$CD11cpos_mDCs_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$CD11cpos_mDCs_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$CD11cpos_mDCs_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
+
+#pDCs
+cor.test(herv_table_HIVneg$pDCs_per_gram, herv_table_HIVneg$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$pDCs_per_gram, herv_table_HIVneg$LTR19_12p13.31, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$pDCs_per_gram, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$pDCs_per_gram, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
+
+
+cor.test(herv_table_HIVneg$pDCs_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$pDCs_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$pDCs_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$pDCs_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
+
+#CD1c- mDCs
+cor.test(herv_table_HIVneg$CD1cneg_mDCs_per_gram, herv_table_HIVneg$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$CD1cneg_mDCs_per_gram, herv_table_HIVneg$LTR19_12p13.31, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$CD1cneg_mDCs_per_gram, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$CD1cneg_mDCs_per_gram, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
+
+
+cor.test(herv_table_HIVneg$CD1cneg_mDCs_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$CD1cneg_mDCs_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$CD1cneg_mDCs_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$CD1cneg_mDCs_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
+
+#CD1c+ mDCs
+cor.test(herv_table_HIVneg$CD1cpos_mDCs_per_gram, herv_table_HIVneg$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$CD1cpos_mDCs_per_gram, herv_table_HIVneg$LTR19_12p13.31, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$CD1cpos_mDCs_per_gram, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$CD1cpos_mDCs_per_gram, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
+
+
+cor.test(herv_table_HIVneg$CD1cpos_mDCs_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$CD1cpos_mDCs_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$CD1cpos_mDCs_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$CD1cpos_mDCs_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
+
+
+
+```
+
+
+#CD4T Cell Subsets L1FLnI_1q23.1s
+```{r}
+##IFNYnegIL17pos
+cor.test(herv_table_HIVneg$IFNYnegIL17pos_CD4_T_Cells_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$IFNYnegIL17pos_CD4_T_Cells_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$IFNYnegIL17pos_CD4_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$IFNYnegIL17pos_CD4_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
+
+##IFNYposIL17neg
+cor.test(herv_table_HIVneg$IFNYposIL17neg_CD4_T_Cells_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$IFNYposIL17neg_CD4_T_Cells_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$IFNYposIL17neg_CD4_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$IFNYposIL17neg_CD4_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
+
+##IFNYposIL17pos
+cor.test(herv_table_HIVneg$IFNYposIL17pos_CD4_T_Cells_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$IFNYposIL17pos_CD4_T_Cells_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$IFNYposIL17pos_CD4_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$IFNYposIL17pos_CD4_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
+
+##IL22pos
+cor.test(herv_table_HIVneg$IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, herv_table_HIVneg$L1FLnI_1q23.1s, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
+```
+
+
+#CD4T Cell Subsets LTR19_12p13.31
+```{r}
+##IFNYnegIL17pos
+cor.test(herv_table_HIVneg$IFNYnegIL17pos_CD4_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$IFNYnegIL17pos_CD4_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$IFNYnegIL17pos_CD4_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$IFNYnegIL17pos_CD4_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
+
+##IFNYposIL17neg
+cor.test(herv_table_HIVneg$IFNYposIL17neg_CD4_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$IFNYposIL17neg_CD4_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$IFNYposIL17neg_CD4_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$IFNYposIL17neg_CD4_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
+
+##IFNYposIL17pos
+cor.test(herv_table_HIVneg$IFNYposIL17pos_CD4_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$IFNYposIL17pos_CD4_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$IFNYposIL17pos_CD4_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$IFNYposIL17pos_CD4_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
+
+##IL22pos
+cor.test(herv_table_HIVneg$IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, herv_table_HIVneg$LTR19_12p13.31, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
+```
+
+#Circulating Markers
+```{r}
+##LPS
+cor.test(herv_table_HIVneg$LPS, herv_table_HIVneg$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$LPS, herv_table_HIVneg$L1FLnI_1q23.1s, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$LPS, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$LPS, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
+
+cor.test(herv_table_HIVneg$LPS, herv_table_HIVneg$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$LPS, herv_table_HIVneg$LTR19_12p13.31, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$LPS, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$LPS, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
+
+##IL6
+##LPS
+cor.test(herv_table_HIVneg$IL6, herv_table_HIVneg$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$IL6, herv_table_HIVneg$L1FLnI_1q23.1s, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$IL6, herv_table_HIVpos$L1FLnI_1q23.1s, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$IL6, herv_table_HIVpos$L1FLnI_1q23.1s, conf.level = 0.95)
+
+cor.test(herv_table_HIVneg$IL6, herv_table_HIVneg$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVneg$IL6, herv_table_HIVneg$LTR19_12p13.31, conf.level = 0.95)
+
+cor.test(herv_table_HIVpos$IL6, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
+
+spearman.ci(herv_table_HIVpos$IL6, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
 ```
 
