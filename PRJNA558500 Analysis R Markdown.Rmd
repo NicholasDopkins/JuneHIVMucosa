@@ -2283,6 +2283,7 @@ spearman.ci(herv_table_HIVneg$IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, herv_t
 cor.test(herv_table_HIVpos$IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, method = "spearman", conf.level = 0.95)
 
 spearman.ci(herv_table_HIVpos$IL22posIFNYnegIL17neg_CD4_T_Cells_per_gram, herv_table_HIVpos$LTR19_12p13.31, conf.level = 0.95)
+
 ```
 
 #Circulating Markers
